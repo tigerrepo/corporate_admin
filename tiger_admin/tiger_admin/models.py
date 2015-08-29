@@ -49,7 +49,7 @@ def create_user_if_not_exist(sender, **kwargs):
         user.save()
 
 class Company(models.Model):
-    name = models.CharField(max_length=32)
+    name = models.CharField(max_length=32, unique=True)
     slogan = models.CharField(max_length=128)
     url = models.CharField(max_length=64, unique=True)
     description = models.CharField(max_length=256)
@@ -73,4 +73,62 @@ class Video(models.Model):
     class Meta:
         db_table = "video_tab"
 
+class Contact(models.Model):
+    sender = models.CharField(max_length=32)
+    mobile = models.CharField(max_length=20)
+    email = models.CharField(max_length=64)
+    title = models.CharField(max_length=64)
+    content = models.CharField(max_length=512)
+    create_date = models.DateTimeField(auto_now_add=True)
+    company = models.ForeignKey(Company, on_delete=models.PROTECT)
+
+    class Meta:
+        db_table = 'contact_tab'
+
+    def __unicode__(self):
+        return self.title
+
+class Tag(models.Model):
+    name = models.CharField(max_length=32, unique=True)
+
+    class Meta:
+        db_table = 'tag_tab'
+
+    def __unicode__(self):
+        return self.name
+
+class CompanyTag(models.Model):
+    company = models.ForeignKey(Company, on_delete=models.PROTECT)
+    tag = models.ForeignKey(Tag, on_delete=models.PROTECT)
+
+    class Meta:
+        unique_together = ('company', 'tag')
+        db_table = 'company_tag_tab'
+
+class Product(models.Model):
+    company = models.ForeignKey(Company, on_delete=models.PROTECT)
+    name = models.CharField(max_length=64)
+    description = models.CharField(max_length=512)
+    create_date = models.DateTimeField(auto_now_add=True)
+    status = models.SmallIntegerField(choices=Account.STATUS_CHOICES, default=0)
+
+    class Meta:
+        unique_together = ('company', 'name')
+        db_table = 'product_tab'
+
+    def __unicode__(self):
+        return self.name
+
+class Gallery(models.Model):
+    name = models.CharField(max_length=64)
+    image_url = models.CharField(max_length=64)
+    is_cover = models.BooleanField(default=False)
+    product = models.ForeignKey(Product, on_delete=models.PROTECT)
+
+    class Meta:
+        unique_together = ('name', 'product')
+        db_table = 'gallery_tab'
+
+    def __unicode__(self):
+        return self.name
 

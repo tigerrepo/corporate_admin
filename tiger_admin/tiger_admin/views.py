@@ -11,14 +11,16 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormVi
 from django.views.generic.detail import DetailView
 from django.contrib.auth import logout
 from django.shortcuts import get_object_or_404
+from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import user_passes_test
+from tiger_admin import forms
 import logging
 
 logger = logging.getLogger('main')
 
 def check_account_permission(user):
-    login_account = get_object_or_404(models.Account, username=user)
+    login_account = get_object_or_404(models.Account, username=user.username)
     return login_account.account_type == models.Account.ACCOUNT_TYPE_ADMIN
 
 def home(request):
@@ -26,9 +28,8 @@ def home(request):
 
 @user_passes_test(check_account_permission)
 def admin_list(request):
-    users = models.Account.objects.all()
+    users = models.Account.objects.filter(account_type=models.Account.ACCOUNT_TYPE_CUSTOMER)
 
-    request.session['account_type']
     return render_to_response(
         'admins.html',
         {
@@ -66,7 +67,7 @@ def admin_add(request):
             password=password,
             salt='',
             account_type=account_type)
-        logger.info("Account %s, %s has been created by %s", username, password, request.user)
+        logger.info("Account %s, %s, %s has been created by %s", username, password, account_type, request.user)
     return redirect('/admin')
 
 class AccountDetailView(DetailView):
@@ -74,13 +75,35 @@ class AccountDetailView(DetailView):
     template_name = 'admin_detail.html'
 
 class AccountUpdateView(UpdateView):
-    pass
+    model = models.Account
+    fields = ['status']
+
+    def form_valid(self, form):
+        obj = self.get_object()
+        print obj.STATUS_DISABLE
+        reply = super(AccountUpdateView, self).form_valid(form)
+        return reply
+    def get_success_url(self):
+        return reverse('admin-detail', kwargs={'pk': self.object.pk})
 
 class AccountDeleteView(DeleteView):
-    pass
+    model = models.Account
+    template_name = 'admin_delete_form.html'
+    def get_success_url(self):
+        return reverse('admin-list')
 
-class AccountPasswordResetView(View):
-    pass
+class AccountPasswordResetView(UpdateView):
+    model = models.Account
+    form_class = forms.AccountPasswordResetForm
+    template_name = 'admin_reset_password_form.html'
+
+    def form_valid(self, form):
+        print form.cleaned_data
+        #super(AccountPasswordResetView, self).form_valid(form)
+        return render(self.request, self.template_name,
+                      context)
+    def get_success_url(self):
+        return reverse('admin-detail', kwargs={'pk': self.object.pk})
 
 class AccountCompanyListView(ListView):
     pass

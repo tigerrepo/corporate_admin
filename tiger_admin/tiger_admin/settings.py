@@ -81,12 +81,25 @@ DATABASES = {
 
 DATABASE_ROUTERS = ['tiger_admin.db_routers.DatabaseRouter']
 
+=======
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    }
+}
+
+>>>>>>> 34d8ce16868e32ce6f8f6075bfac51a0b3ab7655
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
 
+<<<<<<< HEAD
 TIME_ZONE = 'Asia/Singapore'
+=======
+TIME_ZONE = 'UTC'
+>>>>>>> 34d8ce16868e32ce6f8f6075bfac51a0b3ab7655
 
 USE_I18N = True
 

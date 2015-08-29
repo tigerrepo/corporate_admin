@@ -1,0 +1,23 @@
+{% load i18n %}
+<ul>
+  <li>
+    <a class="mws-i-24 i-users" href="#">{% trans "Account Management" %}</a>
+    <ul>
+      <li><a href="{% url 'admin-list' %}">{% trans "Manage Account" %}</a></li>
+    </ul>
+  </li>
+  <li>
+    <a class="mws-i-24 i-laptop" href="#">{% trans "Corporate Management" %}</a>
+    <ul>
+      <li><a href="">{% trans "Manage Corporate" %}</a></li>
+      <li><a href="">{% trans "Manage Video" %}</a></li>
+      <li><a href="">{% trans "Manage Product" %}</a></li>
+    </ul>
+  </li>
+  <li>
+    <a class="mws-i-24 i-new-message" href="#">{% trans "Message Box" %}</a>
+    <ul>
+      <li><a href="">{% trans "Message List" %}</a></li>
+    </ul>
+  </li>
+</ul>

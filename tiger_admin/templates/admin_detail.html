@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="mws-panel grid_8">
+  <div class="mws-panel-header">
+      <span class="mws-i-24 i-table-1">Detail of Admin {{object}}</span>
+    </div>
+    <div class="mws-panel-body">
+        <div class="mws-panel-toolbar top clearfix">
+          <ul>
+              <li><a href="#" class="mws-ic-16 ic-arrow-left" onclick="javascript:window.history.back(); return false;">Back</a></li>
+              <li><a href='{% url "admin-update" object.pk %}' class="mws-ic-16 ic-pencil">Edit Info</a></li>
+              <li><a href='{% url "admin-delete" object.pk %}' class="mws-ic-16 ic-delete">Delete</a></li>
+              <li><a href='{% url "admin-reset-password" object.pk %}' class="mws-ic-16 ic-change-password">Reset Password</a></li>
+              <li><a href='{% url "admin-company-list" object.pk %}' class="mws-ic-16 ic-group">Company List</a></li>
+            </ul>
+        </div>
+        <table class="mws-table" id="datatable">
+            <tbody>
+                 <tr class="gradeX">
+                    <td>Username</td>
+                    <td>{{object.username}}</td>
+                </tr>
+                <tr class="gradeX">
+                    <td>Email</td>
+                    <td>{{object.email}}</td>
+                </tr>
+                <tr class="gradeX">
+                    <td>Account Type</td>
+                    <td>{{ object.get_account_type_display}}</td>
+                </tr>
+                <tr class="gradeX">
+                    <td>Status</td>
+                    <td>{{ object.get_status_display}}</td>
+                </tr>
+                <tr class="gradeX">
+                    <td>Create Date</td>
+                    <td>{{ object.create_time}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+{% endblock %}
+

@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block javascript %}
+<script type="text/javascript">
+
+$(document).ready(function() {
+    // Initialize and sort datatable
+    var oTable = $('#datatable').dataTable({
+        "iDisplayLength": -1,
+        "sPaginationType": "full_numbers",
+        "bDestroy": true,
+    });
+
+    $('#datatable').width('100%');
+    $('#mws-form-dialog').dialog({
+        title: 'Account Info',
+        close: function() {
+            $('[id*="input_field"]').removeClass('error');
+            $('.error').css('display', 'none');
+        }
+    });
+
+    {% if messages %}
+        {% for message in messages %}
+            noty({
+                type: 'error',
+                text: '{{ message|safe }}'
+            });
+        {% endfor %}
+    {% endif %}
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="mws-panel grid_8">
+  <div class="mws-panel-header">
+      <span class="mws-i-24 i-table-1">Admins</span>
+    </div>
+    <div class="mws-panel-body">
+        <div class="mws-panel-toolbar top clearfix">
+          <ul>
+              <li><a href="" class="mws-ic-16 ic-add" id="mws-form-dialog-mdl-btn">Create Admin</a></li>
+            </ul>
+        </div>
+        <table class="mws-datatable-fn mws-table" id="datatable">
+            <thead>
+                <tr>
+                  <th>Username</th>
+                  <th>Email</th>
+                  <th>Account Type</th>
+                  <th>Status</th>
+                  <th>Detail</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in users %}
+                <tr class="gradeX">
+                    <td>{{ u.username }}</td>
+                    <td>{{ u.email }}</td>
+                    <td>{{ u.get_account_type_display }}</td>
+                    <td>{{ u.get_status_display }}</td>
+                    <td><a href='{% url "admin-detail" u.pk %}'><img src="{% static 'css/icons/16/view.png' %}" alt="Detail" width="24" height="24" border="0"></a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div id="mws-form-dialog">
+    <form id="mws-validate" class="mws-form" method="POST" action="/admin/add/">
+        {% csrf_token %}
+        <div id="mws-validate-error" class="mws-form-message error" style="display:none;"></div>
+        <div class="mws-form-inline">
+            <div class="mws-form-row">
+                <label>Username</label>
+
+                <div class="mws-form-item large">
+                    <input type="text" name="username" class="mws-textinput required" id="input_field_username"/>
+                </div>
+            </div>
+            <div class="mws-form-row">
+                <label>Email</label>
+
+                <div class="mws-form-item large">
+                    <input type="email" name="email" class="mws-textinput required" id="input_field_emailfirst_name"/>
+                </div>
+            </div>
+            <div class="mws-form-row">
+                <label>Account Type</label>
+
+                <select name="account_type">
+                    {% for key, value in account_type.items %}
+                    <option value="{{ key }}">{{ value }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

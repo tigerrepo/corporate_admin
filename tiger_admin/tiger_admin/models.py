@@ -8,21 +8,21 @@ class Account(models.Model):
     email = models.CharField(max_length=32, unique=True)
     password = models.CharField(max_length=64)
     salt = models.CharField(max_length=32)
-    STATUS_ENABLE=0
-    STATUS_DISABLE=1
+    STATUS_ENABLE=1
+    STATUS_DISABLE=0
     STATUS_CHOICES = (
         (STATUS_ENABLE, 'Activated'),
         (STATUS_DISABLE, 'Deactivated'),
     )
-    status = models.SmallIntegerField(choices=STATUS_CHOICES, default=0)
+    status = models.SmallIntegerField(choices=STATUS_CHOICES, default=1)
     create_time = models.DateTimeField(auto_now_add=True)
     ACCOUNT_TYPE_ADMIN=0
     ACCOUNT_TYPE_CUSTOMER=1
     ACCOUNT_TYPE_CHOICES = (
+        (ACCOUNT_TYPE_CUSTOMER, u'Customer Admin'),
         (ACCOUNT_TYPE_ADMIN, u'System Admin'),
-        (ACCOUNT_TYPE_CUSTOMER, u'Customer Admin')
     )
-    account_type = models.SmallIntegerField(choices=ACCOUNT_TYPE_CHOICES, default=0)
+    account_type = models.SmallIntegerField(choices=ACCOUNT_TYPE_CHOICES, default=1)
 
     class Meta:
         db_table = "account_tab"

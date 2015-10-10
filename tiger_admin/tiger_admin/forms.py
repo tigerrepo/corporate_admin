@@ -1,5 +1,6 @@
 from django import forms
 from tiger_admin import models
+from django.forms.util import ErrorList
 
 class AccountPasswordResetForm(forms.ModelForm):
     old_password = forms.CharField(widget=forms.PasswordInput)
@@ -11,16 +12,13 @@ class AccountPasswordResetForm(forms.ModelForm):
         for field in self:
             field.field.widget.attrs['class']='mws-textinput'
 
-    def clean(self):
-        old = self.cleaned_data.get('old_password')
-        new = self.cleaned_data.get('new_password')
-        new_confirm = self.cleaned_data.get('new_password_confirm')
-        if old and new and new_confirm:
-            if new != new_confirm:
-                raise forms.ValidationError('Confirm Password is not the same as new password')
-            return self.cleaned_data
-        else:
-            raise forms.ValidationError('123213')
+    def on_password_differnt_error(self):
+        self.errors['new_password'] = ErrorList(['Confirm password is not the same as new password'])
+        self.errors['new_password_confirm'] = ErrorList(['Confirm password is not the same as new password'])
+
+    def on_password_incorrect(self):
+        self.errors['old_password'] = ErrorList(['Old password is not correct'])
 
     class Meta:
         model = models.Account
+        fields = []

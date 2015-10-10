@@ -42,7 +42,9 @@ $(document).ready(function() {
     <div class="mws-panel-body">
         <div class="mws-panel-toolbar top clearfix">
           <ul>
+              {% if is_admin %}
               <li><a href="" class="mws-ic-16 ic-add" id="mws-form-dialog-mdl-btn">Create Admin</a></li>
+              {% endif %}
             </ul>
         </div>
         <table class="mws-datatable-fn mws-table" id="datatable">
@@ -93,9 +95,8 @@ $(document).ready(function() {
                 <label>Account Type</label>
 
                 <select name="account_type">
-                    {% for key, value in account_type.items %}
-                    <option value="{{ key }}">{{ value }}</option>
-                    {% endfor %}
+                    <option value="1">Customer Account</option>
+                    <option value="0">Admin Account</option>
                 </select>
             </div>
         </div>

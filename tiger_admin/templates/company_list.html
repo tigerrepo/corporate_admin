@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block content %}
+<div class="mws-panel grid_8">
+    <div class="mws-panel-header">
+        <span class="mws-i-24 i-table-1">Company List</span>
+    </div>
+    <div class="mws-panel-body">
+        <div class="mws-panel-toolbar top clearfix">
+            <ul>
+              <li><a href='{% url "company-add" %}' class="mws-ic-16 ic-add">Create Website</a></li>
+            </ul>
+        </div>
+        <table class="mws-datatable-fn mws-table" id="datatable">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Url</th>
+                    <th>Admin</th>
+                    <th>Status</th>
+                    <th>Detail</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in company_list %}
+                <tr class="gradeX">
+                    <td>{{ p.name }}</td>
+                    <td>{{ p.url }}</td>
+                    <td>{{ p.account }}</td>
+                    <td>{{ p.get_status_display }}</td>
+                    <td><a href='{% url "company-detail" p.pk %}'><img src="{% static 'css/icons/16/view.png' %}" alt="Detail" width="24" height="24" border="0"></a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

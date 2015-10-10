@@ -154,3 +154,16 @@ class AccountPasswordResetView(UpdateView):
 
 class AccountCompanyListView(ListView):
     pass
+
+class CompanyListView(ListView):
+    model = models.Company
+    template_name = 'company_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(CompanyListView, self).get_context_data(**kwargs)
+        account = models.Account.objects.get(username=self.request.user.username)
+        context['company_list'] = models.Company.objects.filter(account=account)
+        return context
+
+class CompanyCreateView(CreateView):
+    pass

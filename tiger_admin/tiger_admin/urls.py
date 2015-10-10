@@ -13,6 +13,7 @@ urlpatterns = patterns('',
     url(r'^$', 'tiger_admin.views.home', name='home'),
     url(r'^login/$', auth_views.login, {'template_name':'login.html'}, name='login'),
     url(r'^logout/$', auth_views.logout, {'template_name':'logout.html'},name='logout'),
+    # admin
     url(r'^admin/$', 'tiger_admin.views.admin_list', name='admin-list'),
     url(r'^admin/add/$', 'tiger_admin.views.admin_add', name='admin-add'),
     url(r'^admin/(?P<pk>\d+)/detail/$', views.AccountDetailView.as_view(), name='admin-detail'),
@@ -21,5 +22,9 @@ urlpatterns = patterns('',
     url(r'^admin/(?P<pk>\d+)/password_change/$', views.AccountPasswordResetView.as_view(), name='admin-change-password'),
     url(r'^admin/(?P<pk>\d+)/password_reset/$', 'tiger_admin.views.password_reset', name='admin-reset-password'),
     url(r'^admin/(?P<pk>\d+)/company/$', views.AccountCompanyListView.as_view(), name='admin-company-list'),
+    # corporate
+    url(r'^corporaten/$', views.CompanyListView.as_view(), name='company-list'),
+    url(r'^corporaten/(?P<pk>\d+)/detail/$', views.CompanyListView.as_view(), name='company-detail'),
+    url(r'^corporaten/add/$', views.CompanyCreateView.as_view(), name='company-add'),
 
 )

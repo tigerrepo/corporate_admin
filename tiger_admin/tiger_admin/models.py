@@ -60,8 +60,7 @@ class Company(models.Model):
     account = models.ForeignKey(Account, on_delete=models.PROTECT)
 
     class Meta:
-        db_table = "customer_tab"
-
+        db_table = "company_tab"
 
 class Video(models.Model):
     name = models.CharField(max_length=32)

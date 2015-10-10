@@ -10,7 +10,7 @@ CREATE TABLE `account_tab` (
     `account_type` smallint NOT NULL
 )
 ;
-CREATE TABLE `customer_tab` (
+CREATE TABLE `company_tab` (
     `id` integer AUTO_INCREMENT NOT NULL PRIMARY KEY,
     `name` varchar(32) NOT NULL UNIQUE,
     `slogan` varchar(128) NOT NULL,
@@ -23,7 +23,7 @@ CREATE TABLE `customer_tab` (
     `account_id` integer NOT NULL
 )
 ;
-ALTER TABLE `customer_tab` ADD CONSTRAINT `account_id_refs_id_17f03907` FOREIGN KEY (`account_id`) REFERENCES `account_tab` (`id`);
+ALTER TABLE `company_tab` ADD CONSTRAINT `account_id_refs_id_002207d9` FOREIGN KEY (`account_id`) REFERENCES `account_tab` (`id`);
 CREATE TABLE `video_tab` (
     `id` integer AUTO_INCREMENT NOT NULL PRIMARY KEY,
     `name` varchar(32) NOT NULL,
@@ -33,7 +33,7 @@ CREATE TABLE `video_tab` (
     `company_id` integer NOT NULL
 )
 ;
-ALTER TABLE `video_tab` ADD CONSTRAINT `company_id_refs_id_bfdc7238` FOREIGN KEY (`company_id`) REFERENCES `customer_tab` (`id`);
+ALTER TABLE `video_tab` ADD CONSTRAINT `company_id_refs_id_8a4e4a68` FOREIGN KEY (`company_id`) REFERENCES `company_tab` (`id`);
 CREATE TABLE `contact_tab` (
     `id` integer AUTO_INCREMENT NOT NULL PRIMARY KEY,
     `sender` varchar(32) NOT NULL,
@@ -45,7 +45,7 @@ CREATE TABLE `contact_tab` (
     `company_id` integer NOT NULL
 )
 ;
-ALTER TABLE `contact_tab` ADD CONSTRAINT `company_id_refs_id_7a0111c6` FOREIGN KEY (`company_id`) REFERENCES `customer_tab` (`id`);
+ALTER TABLE `contact_tab` ADD CONSTRAINT `company_id_refs_id_71463fd0` FOREIGN KEY (`company_id`) REFERENCES `company_tab` (`id`);
 CREATE TABLE `tag_tab` (
     `id` integer AUTO_INCREMENT NOT NULL PRIMARY KEY,
     `name` varchar(32) NOT NULL UNIQUE
@@ -58,7 +58,7 @@ CREATE TABLE `company_tag_tab` (
     UNIQUE (`company_id`, `tag_id`)
 )
 ;
-ALTER TABLE `company_tag_tab` ADD CONSTRAINT `company_id_refs_id_a6e59d4a` FOREIGN KEY (`company_id`) REFERENCES `customer_tab` (`id`);
+ALTER TABLE `company_tag_tab` ADD CONSTRAINT `company_id_refs_id_799e30ea` FOREIGN KEY (`company_id`) REFERENCES `company_tab` (`id`);
 ALTER TABLE `company_tag_tab` ADD CONSTRAINT `tag_id_refs_id_88fd8dfe` FOREIGN KEY (`tag_id`) REFERENCES `tag_tab` (`id`);
 CREATE TABLE `product_tab` (
     `id` integer AUTO_INCREMENT NOT NULL PRIMARY KEY,
@@ -70,7 +70,7 @@ CREATE TABLE `product_tab` (
     UNIQUE (`company_id`, `name`)
 )
 ;
-ALTER TABLE `product_tab` ADD CONSTRAINT `company_id_refs_id_9ff58b3b` FOREIGN KEY (`company_id`) REFERENCES `customer_tab` (`id`);
+ALTER TABLE `product_tab` ADD CONSTRAINT `company_id_refs_id_f5094944` FOREIGN KEY (`company_id`) REFERENCES `company_tab` (`id`);
 CREATE TABLE `gallery_tab` (
     `id` integer AUTO_INCREMENT NOT NULL PRIMARY KEY,
     `name` varchar(64) NOT NULL,
@@ -81,7 +81,7 @@ CREATE TABLE `gallery_tab` (
 )
 ;
 ALTER TABLE `gallery_tab` ADD CONSTRAINT `product_id_refs_id_c112db26` FOREIGN KEY (`product_id`) REFERENCES `product_tab` (`id`);
-CREATE INDEX `customer_tab_93025c2f` ON `customer_tab` (`account_id`);
+CREATE INDEX `company_tab_93025c2f` ON `company_tab` (`account_id`);
 CREATE INDEX `video_tab_0316dde1` ON `video_tab` (`company_id`);
 CREATE INDEX `contact_tab_0316dde1` ON `contact_tab` (`company_id`);
 CREATE INDEX `company_tag_tab_0316dde1` ON `company_tag_tab` (`company_id`);

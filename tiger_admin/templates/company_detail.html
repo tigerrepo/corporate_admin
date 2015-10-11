@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="mws-panel grid_8">
+	<div class="mws-panel-header">
+    	<span class="mws-i-24 i-table-1">Detail of Website {{object}}</span>
+    </div>
+    <div class="mws-panel-body">
+        <div class="mws-panel-toolbar top clearfix">
+        	<ul>
+        	    <li><a href="#" class="mws-ic-16 ic-arrow-left" onclick="javascript:window.history.back(); return false;">Back</a></li>
+                {% if not is_admin %}
+            	    <li><a href='{% url "company-update" object.pk %}' class="mws-ic-16 ic-pencil">Edit Info</a></li>
+                    <li><a href='{% url "company-delete" object.pk %}' class="mws-ic-16 ic-delete">Delete</a></li>
+                {% endif %}
+                {% if object.status %}
+                    <li><a href='{% url "company-update-status" object.pk %}' class="mws-ic-16 ic-pencil">Deactivate</a></li>
+                {% else %}
+                    <li><a href='{% url "company-update-status" object.pk %}' class="mws-ic-16 ic-pencil">Release</a></li>
+                {% endif %}
+                <li><a href='{% url "company-product-list" object.pk %}' class="mws-ic-16 ic-chart-organisation">Product List</a></li>
+                <li><a href='{% url "company-video-list" object.pk %}' class="mws-ic-16 ic-view">Video List</a></li>
+
+            </ul>
+        </div>
+        <table class="mws-table" id="datatable">
+            <tbody>
+                
+                <tr class="gradeX">
+                    <td>Name</td>
+                    <td>{{object.name}}</td>
+                </tr>
+                <tr class="gradeX">
+                    <td>Slogan</td>
+                    <td>{{object.slogan}}</td>
+                </tr>
+                <tr class="gradeX">
+                    <td>URL</td>
+                    <td><a href="{{ domain }}{{ object.url }}">{{object.url}}</a></td>
+                </tr>
+                <tr class="gradeX">
+                    <td>Description</td>
+                    <td>{{object.description}}</td>
+                </tr>
+                <tr class="gradeX">
+                    <td>Create Date</td>
+                    <td>{{object.create_time}}</td>
+                </tr>
+                <tr class="gradeX">
+                    <td>Status</td>
+                    <td>{{object.get_status_display}}</td>
+                </tr>
+                <tr class="gradeX">
+                    <td>Admin Account</td>
+                    <td>{{object.account}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+

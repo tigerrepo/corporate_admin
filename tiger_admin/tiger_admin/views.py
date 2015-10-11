@@ -20,6 +20,7 @@ from django.contrib.auth import authenticate
 from django.core.mail import send_mail
 import logging
 from tiger_admin import settings
+from django.db import transaction
 
 logger = logging.getLogger('main')
 
@@ -54,13 +55,27 @@ def admin_list(request):
 @login_required
 @user_passes_test(check_account_permission)
 def update_status(request, pk):
-    account = models.Account.objects.get(pk=pk)
-    account.status = not account.status
-    account.save()
+    with transaction.atomic():
+        account = models.Account.objects.get(pk=pk)
+        account.status = not account.status
+        account.save()
+
+        u = User.objects.get(username=account.username)
+        u.is_active = not u.is_active 
+        u.save()
 
     logger.info("Account %s has been updated status, %s, done by %s",
                 account.username, account.status, request.user)
     return redirect(reverse('admin-detail', kwargs={'pk':pk}))
+
+def update_company_status(request, pk):
+    company = models.Company.objects.get(pk=pk)
+    company.status = not company.status
+    company.save()
+
+    logger.info("Website %s has been updated status, %s, done by %s",
+                company.name, company.status, request.user)
+    return redirect(reverse('company-detail', kwargs={'pk':pk}))
 
 @login_required
 @user_passes_test(check_account_permission)
@@ -105,6 +120,10 @@ def admin_add(request):
             password='',
             salt='',
             account_type=account_type)
+
+        u = User.objects.get(username=username)
+        u.set_password(password)
+        u.save()        
         logger.info("Account %s, %s, %s has been created by %s", username, password, account_type, request.user)
     return redirect('/admin')
 
@@ -153,7 +172,16 @@ class AccountPasswordResetView(UpdateView):
         return redirect(reverse('admin-detail', kwargs={'pk': self.object.pk}))
 
 class AccountCompanyListView(ListView):
-    pass
+    model = models.Company
+    template_name = 'company_list.html'
+
+    def get_context_data(self, **kwargs):
+        pk = self.kwargs.get('pk', 0)
+        context = super(AccountCompanyListView, self).get_context_data(**kwargs)
+        account = get_object_or_404(models.Account, pk=pk)
+        context['company_list'] = models.Company.objects.filter(account=account)
+        context['domain'] = settings.DOMAIN_NAME
+        return context
 
 class CompanyListView(ListView):
     model = models.Company
@@ -161,9 +189,64 @@ class CompanyListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(CompanyListView, self).get_context_data(**kwargs)
+
         account = models.Account.objects.get(username=self.request.user.username)
-        context['company_list'] = models.Company.objects.filter(account=account)
+    
+        is_admin = account.account_type == models.Account.ACCOUNT_TYPE_ADMIN
+        if is_admin:
+            company_list = models.Company.objects.all()
+        else:
+            company_list = models.Company.objects.filter(account=account)
+        context['is_admin'] = is_admin
+        context['company_list'] = company_list
+        context['domain'] = settings.DOMAIN_NAME
         return context
 
 class CompanyCreateView(CreateView):
+    model = models.Company
+    form_class = forms.CompanyCreateForm
+    template_name = 'company_add.html'
+
+    def form_valid(self, form):
+        account = models.Account.objects.get(username__exact=self.request.user.username)
+        form.instance.account = account
+        logger.info("Website %s has been created by %s", form.cleaned_data['name'], self.request.user)
+        return super(CompanyCreateView, self).form_valid(form)
+
+    def get_success_url(self):
+        return reverse('company-list')
+
+class CompanyDetailView(DetailView):
+    model = models.Company
+    template_name = 'company_detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(CompanyDetailView, self).get_context_data(**kwargs)
+        context['domain'] = settings.DOMAIN_NAME
+        account = models.Account.objects.get(username=self.request.user.username)
+        is_admin = account.account_type == models.Account.ACCOUNT_TYPE_ADMIN
+        context['is_admin'] = is_admin
+        return context
+
+class CompanyUpdateView(UpdateView):
+    model = models.Company
+    form_class = forms.CompanyCreateForm
+    template_name = 'company_update.html'
+
+    def get_success_url(self):
+        logger.info("Website %s has been updated by %s", self.object.name, self.request.user)
+        return reverse('company-detail', kwargs={'pk': self.object.pk})
+
+class CompanyDeleteView(DeleteView):
+    model = models.Company
+    template_name = 'company_delete_form.html'
+
+    def get_success_url(self):
+        logger.info("Website %s has been deleted by %s", self.object.name, self.request.user)
+        return reverse('company-list')
+
+class CompanyProductListView(ListView):
+    pass
+
+class CompanyVideoListView(ListView):
     pass

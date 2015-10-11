@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.db.models.signals import pre_save
+from django.db.models.signals import pre_save, post_delete
 from django.dispatch import receiver
 
 class Account(models.Model):
@@ -48,6 +48,15 @@ def create_user_if_not_exist(sender, **kwargs):
         user.email = instance.email
         user.save()
 
+@receiver(post_delete, sender=Account)
+def delete_user(sender, instance=None, **kwargs):
+    try:
+        user = User.objects.get(username__exact=instance.username)
+    except User.DoesNotExist:
+        pass
+    else:
+        user.delete()
+
 class Company(models.Model):
     name = models.CharField(max_length=32, unique=True)
     slogan = models.CharField(max_length=128)
@@ -56,11 +65,14 @@ class Company(models.Model):
     create_time = models.DateTimeField(auto_now_add=True)
     valid_from = models.DateTimeField()
     valid_to = models.DateTimeField()
-    status = models.SmallIntegerField(choices=Account.STATUS_CHOICES, default=0)
+    status = models.SmallIntegerField(choices=Account.STATUS_CHOICES, default=Account.STATUS_DISABLE)
     account = models.ForeignKey(Account, on_delete=models.PROTECT)
 
     class Meta:
         db_table = "company_tab"
+
+    def __unicode__(self):
+        return self.name
 
 class Video(models.Model):
     name = models.CharField(max_length=32)

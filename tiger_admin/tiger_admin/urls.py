@@ -23,8 +23,13 @@ urlpatterns = patterns('',
     url(r'^admin/(?P<pk>\d+)/password_reset/$', 'tiger_admin.views.password_reset', name='admin-reset-password'),
     url(r'^admin/(?P<pk>\d+)/company/$', views.AccountCompanyListView.as_view(), name='admin-company-list'),
     # corporate
-    url(r'^corporaten/$', views.CompanyListView.as_view(), name='company-list'),
-    url(r'^corporaten/(?P<pk>\d+)/detail/$', views.CompanyListView.as_view(), name='company-detail'),
-    url(r'^corporaten/add/$', views.CompanyCreateView.as_view(), name='company-add'),
+    url(r'^corporate/$', views.CompanyListView.as_view(), name='company-list'),
+    url(r'^corporate/(?P<pk>\d+)/detail/$', views.CompanyDetailView.as_view(), name='company-detail'),
+    url(r'^corporate/(?P<pk>\d+)/update/$', views.CompanyUpdateView.as_view(), name='company-update'),
+    url(r'^corporate/(?P<pk>\d+)/update_status/$', 'tiger_admin.views.update_company_status', name='company-update-status'),
+    url(r'^corporate/(?P<pk>\d+)/delete/$', views.CompanyDeleteView.as_view(), name='company-delete'),
+    url(r'^corporate/add/$', views.CompanyCreateView.as_view(), name='company-add'),
+    url(r'^corporate/(?P<pk>\d+)/product/$', views.CompanyProductListView.as_view(), name='company-product-list'),
+    url(r'^corporate/(?P<pk>\d+)/video/$', views.CompanyVideoListView.as_view(), name='company-video-list'),
 
 )

@@ -22,3 +22,18 @@ class AccountPasswordResetForm(forms.ModelForm):
     class Meta:
         model = models.Account
         fields = []
+
+
+class CompanyCreateForm(forms.ModelForm):
+    description = forms.CharField(widget=forms.Textarea)
+    def __init__(self, *args, **kwargs):
+        super(CompanyCreateForm, self).__init__(*args, **kwargs)
+        for field in self:
+            field.field.widget.attrs['class']='mws-textinput'
+
+    def clean_url(self):
+        return self.cleaned_data['url'].lower()
+
+    class Meta:
+        model = models.Company
+        fields = ['name', 'slogan', 'url', 'description']

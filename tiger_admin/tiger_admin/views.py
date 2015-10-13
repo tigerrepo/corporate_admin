@@ -61,7 +61,7 @@ def update_status(request, pk):
         account.save()
 
         u = User.objects.get(username=account.username)
-        u.is_active = not u.is_active 
+        u.is_active = not u.is_active
         u.save()
 
     logger.info("Account %s has been updated status, %s, done by %s",
@@ -123,7 +123,7 @@ def admin_add(request):
 
         u = User.objects.get(username=username)
         u.set_password(password)
-        u.save()        
+        u.save()
         logger.info("Account %s, %s, %s has been created by %s", username, password, account_type, request.user)
     return redirect('/admin')
 
@@ -191,7 +191,7 @@ class CompanyListView(ListView):
         context = super(CompanyListView, self).get_context_data(**kwargs)
 
         account = models.Account.objects.get(username=self.request.user.username)
-    
+
         is_admin = account.account_type == models.Account.ACCOUNT_TYPE_ADMIN
         if is_admin:
             company_list = models.Company.objects.all()
@@ -250,3 +250,52 @@ class CompanyProductListView(ListView):
 
 class CompanyVideoListView(ListView):
     pass
+
+class CategoryCreateView(CreateView):
+    model = models.Tag
+    form_class = forms.CategoryCreateForm
+    template_name = 'category_add.html'
+
+    def get_success_url(self):
+        logger.info("Category %s has been updated by %s", self.object.name, self.request.user)
+        return reverse('category-list')
+
+class CategoryListView(ListView):
+    model = models.Tag
+    template_name = 'category_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(CategoryListView, self).get_context_data(**kwargs)
+        account = models.Account.objects.get(username=self.request.user.username)
+        is_admin = account.account_type == models.Account.ACCOUNT_TYPE_ADMIN
+        context['is_admin'] = is_admin
+        return context
+
+class CategoryDetailView(DetailView):
+    model = models.Tag
+    template_name = 'category_detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(CategoryDetailView, self).get_context_data(**kwargs)
+        account = models.Account.objects.get(username=self.request.user.username)
+        is_admin = account.account_type == models.Account.ACCOUNT_TYPE_ADMIN
+        context['is_admin'] = is_admin
+        return context
+
+class CategoryDeleteView(DeleteView):
+    model = models.Tag
+    template_name = 'category_delete_form.html'
+
+    def get_success_url(self):
+        logger.info("Category %s has been deleted by %s", self.object.name, self.request.user)
+        return reverse('category-list')
+
+class CategoryUpdateView(UpdateView):
+    model = models.Tag
+    form_class = forms.CategoryCreateForm
+    template_name = 'category_update.html'
+
+    def get_success_url(self):
+        logger.info("Category %s has been updated by %s", self.object.name, self.request.user)
+        return reverse('category-detail', kwargs={'pk': self.object.pk})
+

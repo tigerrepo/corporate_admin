@@ -13,6 +13,7 @@ urlpatterns = patterns('',
     url(r'^$', 'tiger_admin.views.home', name='home'),
     url(r'^login/$', auth_views.login, {'template_name':'login.html'}, name='login'),
     url(r'^logout/$', auth_views.logout, {'template_name':'logout.html'},name='logout'),
+
     # admin
     url(r'^admin/$', 'tiger_admin.views.admin_list', name='admin-list'),
     url(r'^admin/add/$', 'tiger_admin.views.admin_add', name='admin-add'),
@@ -22,6 +23,7 @@ urlpatterns = patterns('',
     url(r'^admin/(?P<pk>\d+)/password_change/$', views.AccountPasswordResetView.as_view(), name='admin-change-password'),
     url(r'^admin/(?P<pk>\d+)/password_reset/$', 'tiger_admin.views.password_reset', name='admin-reset-password'),
     url(r'^admin/(?P<pk>\d+)/company/$', views.AccountCompanyListView.as_view(), name='admin-company-list'),
+
     # corporate
     url(r'^corporate/$', views.CompanyListView.as_view(), name='company-list'),
     url(r'^corporate/(?P<pk>\d+)/detail/$', views.CompanyDetailView.as_view(), name='company-detail'),
@@ -31,5 +33,12 @@ urlpatterns = patterns('',
     url(r'^corporate/add/$', views.CompanyCreateView.as_view(), name='company-add'),
     url(r'^corporate/(?P<pk>\d+)/product/$', views.CompanyProductListView.as_view(), name='company-product-list'),
     url(r'^corporate/(?P<pk>\d+)/video/$', views.CompanyVideoListView.as_view(), name='company-video-list'),
+
+    # tag
+    url(r'^category/$', views.CategoryListView.as_view(), name='category-list'),
+    url(r'^category/add/$', views.CategoryCreateView.as_view(), name='category-add'),
+    url(r'^category/(?P<pk>\d+)/detail/$', views.CategoryDetailView.as_view(), name='category-detail'),
+    url(r'^category/(?P<pk>\d+)/update/$', views.CategoryUpdateView.as_view(), name='category-update'),
+    url(r'^category/(?P<pk>\d+)/delete/$', views.CategoryDeleteView.as_view(), name='category-delete'),
 
 )

@@ -37,3 +37,13 @@ class CompanyCreateForm(forms.ModelForm):
     class Meta:
         model = models.Company
         fields = ['name', 'slogan', 'url', 'description']
+
+class CategoryCreateForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(CategoryCreateForm, self).__init__(*args, **kwargs)
+        for field in self:
+            field.field.widget.attrs['class']='mws-textinput'
+
+    class Meta:
+        model = models.Tag
+        fields = ['name']

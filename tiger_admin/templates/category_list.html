@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block content %}
+<div class="mws-panel grid_8">
+    <div class="mws-panel-header">
+        <span class="mws-i-24 i-table-1">Category List</span>
+    </div>
+    <div class="mws-panel-body">
+        {% if is_admin %}
+        <div class="mws-panel-toolbar top clearfix">
+            <ul>
+              <li><a href='{% url "category-add" %}' class="mws-ic-16 ic-add">Create Category</a></li>
+            </ul>
+        </div>
+        {% endif %}
+        <table class="mws-datatable-fn mws-table" id="datatable">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Detail</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in object_list %}
+                <tr class="gradeX">
+                    <td>{{ c.name }}</td>
+                    <td><a href='{% url "category-detail" c.pk %}'><img src="{% static 'css/icons/16/view.png' %}" alt="Detail" width="24" height="24" border="0"></a></td>
+                </tr>
+ 
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

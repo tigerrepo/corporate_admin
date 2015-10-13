@@ -26,6 +26,7 @@ class AccountPasswordResetForm(forms.ModelForm):
 
 class CompanyCreateForm(forms.ModelForm):
     description = forms.CharField(widget=forms.Textarea)
+    tag = forms.ModelChoiceField(queryset=models.Tag.objects.all())
     def __init__(self, *args, **kwargs):
         super(CompanyCreateForm, self).__init__(*args, **kwargs)
         for field in self:

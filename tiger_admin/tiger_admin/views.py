@@ -55,14 +55,19 @@ def admin_list(request):
 @login_required
 @user_passes_test(check_account_permission)
 def update_status(request, pk):
-    with transaction.atomic():
-        account = models.Account.objects.get(pk=pk)
-        account.status = not account.status
-        account.save()
+    try:
+        with transaction.atomic(using="tiger_admin"):
+            account = models.Account.objects.get(pk=pk)
+            account.status = not account.status
+            account.save()
 
-        u = User.objects.get(username=account.username)
-        u.is_active = not u.is_active
-        u.save()
+            u = User.objects.get(username=account.username)
+            u.is_active = not u.is_active
+            u.save()
+    except Exception as e:
+        logger.error("Account %s updated status fail, roll back.", account.username)
+        # add error page
+        return redirect(reverse('admin-detail', kwargs={'pk':pk}))
 
     logger.info("Account %s has been updated status, %s, done by %s",
                 account.username, account.status, request.user)
@@ -208,10 +213,22 @@ class CompanyCreateView(CreateView):
     template_name = 'company_add.html'
 
     def form_valid(self, form):
-        account = models.Account.objects.get(username__exact=self.request.user.username)
-        form.instance.account = account
+        try:
+            with transaction.atomic(using='tiger_admin'):
+                account = models.Account.objects.get(username__exact=self.request.user.username)
+                form.instance.account = account
+                self.object = form.save()
+                tag = form.cleaned_data['tag']
+
+                models.CompanyTag.objects.get_or_create(company=self.object, tag=tag)
+        except Exception as e:
+            logger.error("create Website fail, roll back, website %s, operate by %s", form.cleaned_data['name'], self.request.user)
+            # add error in page
+            return super(CompanyCreateView, self).form_invalid(form)
+
         logger.info("Website %s has been created by %s", form.cleaned_data['name'], self.request.user)
-        return super(CompanyCreateView, self).form_valid(form)
+        context = self.get_context_data()
+        return render(self.request, 'company_list.html', context)
 
     def get_success_url(self):
         return reverse('company-list')

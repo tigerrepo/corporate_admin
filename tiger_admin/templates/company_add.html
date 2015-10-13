@@ -50,6 +50,16 @@
                         {% endif %}
                     </div>
                 </div>
+                <div class="mws-form-row">
+                    <label>Category</label>
+
+                    <div class="mws-form-item medium">
+                        {{ form.tag }}
+                        {% if form.tag.errors %}
+                            <label class='error'>{{form.tag.errors.0}}</label>
+                        {% endif %}
+                    </div>
+                </div>
                 <div class="mws-button-row">
                 <button type="button" class="mws-button gray large"  onclick='javascript:window.history.back();'>Back</button>
                 <input type="submit" class="mws-button green large" value="Submit" />

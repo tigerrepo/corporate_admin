@@ -316,3 +316,51 @@ class CategoryUpdateView(UpdateView):
         logger.info("Category %s has been updated by %s", self.object.name, self.request.user)
         return reverse('category-detail', kwargs={'pk': self.object.pk})
 
+class ProductCreateView(CreateView):
+    model = models.Tag
+    form_class = forms.ProductCreateForm
+    template_name = 'product_add.html'
+
+    def get_success_url(self):
+        logger.info("Product %s has been updated by %s", self.object.name, self.request.user)
+        return reverse('product-list')
+
+class ProductListView(ListView):
+    model = models.Tag
+    template_name = 'product_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(ProductListView, self).get_context_data(**kwargs)
+        account = models.Account.objects.get(username=self.request.user.username)
+        is_admin = account.account_type == models.Account.ACCOUNT_TYPE_ADMIN
+        context['is_admin'] = is_admin
+        return context
+
+class ProductDetailView(DetailView):
+    model = models.Tag
+    template_name = 'product_detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(ProductDetailView, self).get_context_data(**kwargs)
+        account = models.Account.objects.get(username=self.request.user.username)
+        is_admin = account.account_type == models.Account.ACCOUNT_TYPE_ADMIN
+        context['is_admin'] = is_admin
+        return context
+
+class ProductDeleteView(DeleteView):
+    model = models.Tag
+    template_name = 'product_delete_form.html'
+
+    def get_success_url(self):
+        logger.info("Product %s has been deleted by %s", self.object.name, self.request.user)
+        return reverse('product-list')
+
+class ProductUpdateView(UpdateView):
+    model = models.Tag
+    form_class = forms.ProductCreateForm
+    template_name = 'product_update.html'
+
+    def get_success_url(self):
+        logger.info("Product %s has been updated by %s", self.object.name, self.request.user)
+        return reverse('product-detail', kwargs={'pk': self.object.pk})
+

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="mws-panel grid_6">
+    <div class="mws-panel-header">
+        <span class="mws-i-24 i-pencil">Delete Confirm</span>
+    </div>
+    <div class="mws-panel-body">
+        <form class="mws-form" action="" method="post">{% csrf_token %}
+            <div class="mws-form-inline">
+                <div class="mws-form-row">
+                    <span>Are you sure you want to delete  {{object.name}} from Product List ?</span>
+                </div>
+                <div class="mws-button-row">
+                    <button type="button" class="mws-button gray large"  onclick='javascript:window.history.back();'>Back</button>
+                    <input type="submit" class="mws-button green large" value="Confirm" />
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

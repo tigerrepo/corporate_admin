@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="mws-panel grid_8">
+	<div class="mws-panel-header">
+    	<span class="mws-i-24 i-table-1">Detail of Product {{object}}</span>
+    </div>
+    <div class="mws-panel-body">
+        <div class="mws-panel-toolbar top clearfix">
+        	<ul>
+        	    <li><a href="#" class="mws-ic-16 ic-arrow-left" onclick="javascript:window.history.back(); return false;">Back</a></li>
+                {% if is_admin %}
+            	    <li><a href='{% url "product-update" object.pk %}' class="mws-ic-16 ic-pencil">Edit Info</a></li>
+                  <li><a href='{% url "product-delete" object.pk %}' class="mws-ic-16 ic-delete">Delete</a></li>
+                {% endif %}
+            </ul>
+        </div>
+        <table class="mws-table" id="datatable">
+            <tbody>
+                <tr class="gradeX">
+                    <td>Name</td>
+                    <td>{{object.name}}</td>
+                </tr>
+                <tr class="gradeX">
+                    <td>Company</td>
+                    <td>{{object.company}}</td>
+                </tr>
+                <tr class="gradeX">
+                    <td>Description</td>
+                    <td>{{object.description}}</td>
+                </tr>
+                <tr class="gradeX">
+                    <td>Create Date</td>
+                    <td>{{object.create_date}}</td>
+                </tr>
+                <tr class="gradeX">
+                    <td>Status</td>
+                    <td>{{object.get_status_display}}</td>
+                </tr>
+
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+

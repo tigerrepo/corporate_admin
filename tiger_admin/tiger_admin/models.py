@@ -121,7 +121,7 @@ class Product(models.Model):
     name = models.CharField(max_length=64)
     description = models.CharField(max_length=512)
     create_date = models.DateTimeField(auto_now_add=True)
-    status = models.SmallIntegerField(choices=Account.STATUS_CHOICES, default=0)
+    status = models.SmallIntegerField(choices=Account.STATUS_CHOICES, default=1)
 
     class Meta:
         unique_together = ('company', 'name')

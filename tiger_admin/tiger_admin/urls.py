@@ -41,4 +41,12 @@ urlpatterns = patterns('',
     url(r'^category/(?P<pk>\d+)/update/$', views.CategoryUpdateView.as_view(), name='category-update'),
     url(r'^category/(?P<pk>\d+)/delete/$', views.CategoryDeleteView.as_view(), name='category-delete'),
 
+    # product
+    url(r'^product/$', views.ProductListView.as_view(), name='product-list'),
+    url(r'^product/add/$', views.ProductCreateView.as_view(), name='product-add'),
+    url(r'^product/(?P<pk>\d+)/detail/$', views.ProductDetailView.as_view(), name='product-detail'),
+    url(r'^product/(?P<pk>\d+)/update/$', views.ProductUpdateView.as_view(), name='product-update'),
+    url(r'^product/(?P<pk>\d+)/delete/$', views.ProductDeleteView.as_view(), name='product-delete'),
+
+
 )

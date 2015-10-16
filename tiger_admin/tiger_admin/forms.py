@@ -50,6 +50,7 @@ class CategoryCreateForm(forms.ModelForm):
         fields = ['name']
 
 class ProductCreateForm(forms.ModelForm):
+    description = forms.CharField(widget=forms.Textarea)
     def __init__(self, *args, **kwargs):
         super(ProductCreateForm, self).__init__(*args, **kwargs)
         for field in self:

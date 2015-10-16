@@ -326,7 +326,7 @@ class ProductCreateView(CreateView):
         return reverse('product-list')
 
 class ProductListView(ListView):
-    model = models.Tag
+    model = models.Product
     template_name = 'product_list.html'
 
     def get_context_data(self, **kwargs):
@@ -337,7 +337,7 @@ class ProductListView(ListView):
         return context
 
 class ProductDetailView(DetailView):
-    model = models.Tag
+    model = models.Product
     template_name = 'product_detail.html'
 
     def get_context_data(self, **kwargs):
@@ -348,7 +348,7 @@ class ProductDetailView(DetailView):
         return context
 
 class ProductDeleteView(DeleteView):
-    model = models.Tag
+    model = models.Product
     template_name = 'product_delete_form.html'
 
     def get_success_url(self):
@@ -356,7 +356,7 @@ class ProductDeleteView(DeleteView):
         return reverse('product-list')
 
 class ProductUpdateView(UpdateView):
-    model = models.Tag
+    model = models.Product
     form_class = forms.ProductCreateForm
     template_name = 'product_update.html'
 
@@ -364,3 +364,5 @@ class ProductUpdateView(UpdateView):
         logger.info("Product %s has been updated by %s", self.object.name, self.request.user)
         return reverse('product-detail', kwargs={'pk': self.object.pk})
 
+class ProductImageListView(ListView):
+    pass

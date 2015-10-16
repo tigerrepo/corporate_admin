@@ -49,4 +49,6 @@ urlpatterns = patterns('',
     url(r'^product/(?P<pk>\d+)/delete/$', views.ProductDeleteView.as_view(), name='product-delete'),
 
 
+    url(r'^product/(?P<pk>\d+)/image/$', views.ProductImageListView.as_view(), name='product-image-list'),
+
 )

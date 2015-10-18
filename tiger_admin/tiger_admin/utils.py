@@ -17,6 +17,8 @@ def upload_image(f, directory):
     ext = str(f).split(".")[-1]
     filename = "%s.%s" % (generate_random_password(length=8), ext)
     filepath = '%s/%s' % (directory, filename)
+    print filepath
+    print directory
     if not os.path.exists(directory):
         os.makedirs(directory)
     with open(filepath, 'wb+') as destination:

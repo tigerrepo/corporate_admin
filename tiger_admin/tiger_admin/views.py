@@ -265,7 +265,15 @@ class CompanyDeleteView(DeleteView):
         return reverse('company-list')
 
 class CompanyProductListView(ListView):
-    pass
+    model = models.Product
+    template_name = 'product_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(CompanyProductListView, self).get_context_data(**kwargs)
+        pk = self.kwargs.get('pk', 0)
+        company = get_object_or_404(models.Company, pk=pk)
+        context['object_list'] = models.Product.objects.filter(company=company)
+        return context
 
 class CompanyVideoListView(ListView):
     pass

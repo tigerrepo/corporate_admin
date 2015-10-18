@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="mws-panel grid_8">
+	<div class="mws-panel-header">
+    	<span class="mws-i-24 i-table-1">Detail of Product Image</span>
+    </div>
+    <div class="mws-panel-body">
+        <div class="mws-panel-toolbar top clearfix">
+        	<ul>
+        	    <li><a href="#" class="mws-ic-16 ic-arrow-left" onclick="javascript:window.history.back(); return false;">Back</a></li>
+                  <li><a href='{% url "gallery-update" product object.pk %}' class="mws-ic-16 ic-edit">Edit</a></li>
+                  <li><a href='{% url "gallery-delete" product object.pk %}' class="mws-ic-16 ic-delete">Delete</a></li>
+            </ul>
+        </div>
+        <table class="mws-table" id="datatable">
+            <tbody>
+                <tr class="gradeX">
+                    <td>Name</td>
+                    <td>{{object.name}}</td>
+                </tr>
+                <tr class="gradeX">
+                    <td>Image Url</td>
+                    <td><img src="{{ url_prefix }}{{ product }}/{{ object.image_url }}" height="250px"></td>
+                </tr>
+                <tr class="gradeX">
+                    <td>Is Cover</td>
+                    <td>{{object.is_cover}}</td>
+                </tr>
+
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+

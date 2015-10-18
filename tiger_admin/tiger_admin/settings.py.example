@@ -102,6 +102,8 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "static"),
 )
+MEDIA_ROOT = '/var/www/riceglobal'
+MEDIA_URL = '%s' % IMAGE_URL_PREFIX
 
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
@@ -158,3 +160,4 @@ DEFAULT_FROM_EMAIL = 'luchen.sg@gmail.com'
 DEFAULT_TO_EMAIL = 'miracleluchen@gmail.com'
 
 DOMAIN_NAME = 'http://www.hahaha.com/'
+IMAGE_URL_PREFIX = 'http://cdn.riceglobal.com/gallery/'

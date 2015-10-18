@@ -60,3 +60,16 @@ class ProductCreateForm(forms.ModelForm):
         model = models.Product
         fields = ['company', 'name', 'description']
 
+class GalleryUploadForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(GalleryUploadForm, self).__init__(*args, **kwargs)
+        for field in self:
+            field.field.widget.attrs['class']='mws-textinput'
+
+    class Meta:
+        model = models.Gallery
+        fields = ['image_url', 'name', 'is_cover']
+
+
+    def on_duplicate_error(self):
+        self.errors['name'] = ErrorList(['Image Name is duplicated with existing images'])

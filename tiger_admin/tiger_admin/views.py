@@ -1,26 +1,28 @@
-from django.shortcuts import render
-from tiger_admin import models
-from django.shortcuts import render_to_response, redirect
-from django.template import RequestContext
-from django.contrib import messages
-from utils import format_date, generate_random_password
 import hashlib
-from django.views.generic import View
-from django.views.generic.list import ListView
-from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView
-from django.views.generic.detail import DetailView
-from django.contrib.auth import logout
-from django.shortcuts import get_object_or_404
-from django.core.urlresolvers import reverse
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.decorators import user_passes_test
-from tiger_admin import forms
-from django.contrib.auth.models import User
-from django.contrib.auth import authenticate
-from django.core.mail import send_mail
 import logging
-from tiger_admin import settings
+import time
+
+import django
+from django.contrib import messages
+from django.contrib.auth import authenticate, logout
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.models import User
+from django.core.mail import send_mail
+from django.core.urlresolvers import reverse
 from django.db import transaction
+from django.db.utils import IntegrityError
+from django.http import HttpResponseRedirect
+from django.shortcuts import (get_object_or_404, redirect, render,
+                              render_to_response)
+from django.template import RequestContext
+from django.views.generic import View
+from django.views.generic.detail import DetailView
+from django.views.generic.edit import (CreateView, DeleteView, FormView,
+                                       UpdateView)
+from django.views.generic.list import ListView
+
+from tiger_admin import forms, models, settings
+from utils import format_date, generate_random_password, upload_image
 
 logger = logging.getLogger('main')
 
@@ -321,6 +323,14 @@ class ProductCreateView(CreateView):
     form_class = forms.ProductCreateForm
     template_name = 'product_add.html'
 
+    def get_context_data(self, **kwargs):
+        context = super(ProductCreateView, self).get_context_data(**kwargs)
+        account = models.Account.objects.get(username=self.request.user.username)
+        is_admin = account.account_type == models.Account.ACCOUNT_TYPE_ADMIN
+        if not is_admin:
+            context['form'].fields['company'] = django.forms.ModelChoiceField(queryset=models.Company.objects.filter(account=account))
+        return context
+
     def get_success_url(self):
         logger.info("Product %s has been updated by %s", self.object.name, self.request.user)
         return reverse('product-list')
@@ -365,4 +375,95 @@ class ProductUpdateView(UpdateView):
         return reverse('product-detail', kwargs={'pk': self.object.pk})
 
 class ProductImageListView(ListView):
-    pass
+    model = models.Gallery
+    template_name = 'gallery_list.html'
+
+    def get_context_data(self, **kwargs):
+        pk = self.kwargs.get('ppk', 0)
+        context = super(ProductImageListView, self).get_context_data(**kwargs)
+        context['gallery_list'] = models.Gallery.objects.filter(product_id=pk)
+        context['product'] = pk
+        context['url_prefix'] = settings.IMAGE_URL_PREFIX
+        return context
+
+class GalleryDetailView(DetailView):
+    model = models.Gallery
+    template_name = 'gallery_detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(GalleryDetailView, self).get_context_data(**kwargs)
+        context['url_prefix'] = settings.IMAGE_URL_PREFIX
+        return context
+
+class GalleryCreateView(CreateView):
+    model = models.Gallery
+    form_class = forms.GalleryUploadForm
+    template_name = 'gallery_add.html'
+
+    def form_valid(self, form):
+        try:
+            pk = self.kwargs.get('ppk', 0)
+            product = get_object_or_404(models.Product, pk=pk)
+            if form.cleaned_data['is_cover']:
+                models.Gallery.objects.filter(product_id=pk).update(is_cover=False)
+            directory = '%s%s' % (settings.MEDIA_ROOT, pk)
+            image_url = upload_image(form.cleaned_data['image_url'], directory)
+            form.instance.image_url = image_url
+            form.instance.product = product
+            form.save()
+        except IntegrityError:
+            form.on_duplicate_error()
+            return self.form_invalid(form)
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        pk = self.kwargs.get('ppk', 0)
+        logger.info("Image has been uploaded by %s", self.request.user)
+        return reverse('product-image-list', kwargs={'ppk': pk})
+
+class GalleryDetailView(DetailView):
+    model = models.Gallery
+    template_name = 'gallery_detail.html'
+
+    def get_context_data(self, **kwargs):
+        pk = self.kwargs.get('ppk', 0)
+        context = super(GalleryDetailView, self).get_context_data(**kwargs)
+        context['url_prefix'] = settings.IMAGE_URL_PREFIX
+        context['product'] = pk
+        return context
+
+
+class GalleryDeleteView(DeleteView):
+    model = models.Gallery
+    template_name = 'gallery_delete_form.html'
+
+    def get_success_url(self):
+        pk = self.kwargs.get('ppk', 0)
+        logger.info("Image %s has been deleted by %s", self.object.name, self.request.user)
+        return reverse('product-image-list', kwargs={'ppk': pk})
+
+class GalleryUpdateView(UpdateView):
+    model = models.Gallery
+    form_class = forms.GalleryUploadForm
+    template_name = 'gallery_update.html'
+
+    def form_valid(self, form):
+        try:
+            pk = self.kwargs.get('ppk', 0)
+            if form.cleaned_data['is_cover']:
+                models.Gallery.objects.filter(product_id=pk).update(is_cover=False)
+            directory = '%s%s' % (settings.MEDIA_ROOT, pk)
+            image_url = upload_image(form.cleaned_data['image_url'], directory)
+            form.instance.image_url = image_url
+            form.save()
+        except IntegrityError:
+            form.on_duplicate_error()
+            return self.form_invalid(form)
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        pk = self.kwargs.get('ppk', 0)
+        logger.info("Image %s has been updated by %s", self.object.id, self.request.user)
+        return reverse('gallery-detail', kwargs={'ppk': pk, 'pk':self.object.pk})
+
+

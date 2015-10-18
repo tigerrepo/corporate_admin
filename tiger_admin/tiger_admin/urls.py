@@ -48,7 +48,11 @@ urlpatterns = patterns('',
     url(r'^product/(?P<pk>\d+)/update/$', views.ProductUpdateView.as_view(), name='product-update'),
     url(r'^product/(?P<pk>\d+)/delete/$', views.ProductDeleteView.as_view(), name='product-delete'),
 
-
-    url(r'^product/(?P<pk>\d+)/image/$', views.ProductImageListView.as_view(), name='product-image-list'),
+    # gallery
+    url(r'^product/(?P<ppk>\d+)/gallery/$', views.ProductImageListView.as_view(), name='product-image-list'),
+    url(r'^product/(?P<ppk>\d+)/gallery/add/$', views.GalleryCreateView.as_view(), name='gallery-add'),
+    url(r'^product/(?P<ppk>\d+)/gallery/(?P<pk>\d+)/detail/$', views.GalleryDetailView.as_view(), name='gallery-detail'),
+    url(r'^product/(?P<ppk>\d+)/gallery/(?P<pk>\d+)/delete/$', views.GalleryDeleteView.as_view(), name='gallery-delete'),
+    url(r'^product/(?P<ppk>\d+)/gallery/(?P<pk>\d+)/update/$', views.GalleryUpdateView.as_view(), name='gallery-update'),
 
 )

@@ -9,11 +9,9 @@
         <div class="mws-panel-toolbar top clearfix">
         	<ul>
         	    <li><a href="#" class="mws-ic-16 ic-arrow-left" onclick="javascript:window.history.back(); return false;">Back</a></li>
-                {% if is_admin %}
             	    <li><a href='{% url "product-update" object.pk %}' class="mws-ic-16 ic-pencil">Edit Info</a></li>
                   <li><a href='{% url "product-delete" object.pk %}' class="mws-ic-16 ic-delete">Delete</a></li>
-                {% endif %}
-                  <li><a href='{% url "product-image-list" object.pk %}' class="mws-ic-16 ic-image">Image Management</a></li>
+                  <li><a href='{% url "product-image-list" object.pk %}' class="mws-ic-16 ic-add">Image Management</a></li>
             </ul>
         </div>
         <table class="mws-table" id="datatable">

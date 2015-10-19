@@ -1,7 +1,7 @@
 import hashlib
 import logging
 import time
-
+import collections
 import django
 from django.contrib import messages
 from django.contrib.auth import authenticate, logout
@@ -204,8 +204,25 @@ class CompanyListView(ListView):
             company_list = models.Company.objects.all()
         else:
             company_list = models.Company.objects.filter(account=account)
+
+        company_tag_dict = collections.defaultdict(list)
+        for company_tag in models.CompanyTag.objects.select_related("Tag").all():
+            company_tag_dict[company_tag.company_id].append(company_tag.tag.name)
+
+        company_list_with_tag = []
+        for company in company_list:
+            company_dict = {}
+            company_dict['name'] = company.name
+            company_dict['url'] = company.url
+            company_dict['account'] = company.account
+            company_dict['status'] = company.get_status_display
+            company_dict['pk'] = company.id
+            company_dict['create_time'] = company.create_time
+            company_dict['tag'] = ','.join(company_tag_dict.get(company.id))
+            company_list_with_tag.append(company_dict)
+
         context['is_admin'] = is_admin
-        context['company_list'] = company_list
+        context['company_list'] = company_list_with_tag
         context['domain'] = settings.DOMAIN_NAME
         return context
 
@@ -244,6 +261,13 @@ class CompanyDetailView(DetailView):
         context['domain'] = settings.DOMAIN_NAME
         account = models.Account.objects.get(username=self.request.user.username)
         is_admin = account.account_type == models.Account.ACCOUNT_TYPE_ADMIN
+
+        company_tag_dict = collections.defaultdict(list)
+        for company_tag in models.CompanyTag.objects.select_related("Tag").all():
+            company_tag_dict[company_tag.company_id].append(company_tag.tag.name)
+
+        context['tag'] = ','.join(company_tag_dict.get(self.object.pk))
+
         context['is_admin'] = is_admin
         return context
 

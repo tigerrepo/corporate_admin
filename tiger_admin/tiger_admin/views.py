@@ -39,7 +39,10 @@ def admin_list(request):
     account = models.Account.objects.get(username=request.user.username)
     is_admin = account.account_type == models.Account.ACCOUNT_TYPE_ADMIN
     if is_admin:
-        users = models.Account.objects.filter(account_type=models.Account.ACCOUNT_TYPE_CUSTOMER)
+        if request.user.is_superuser:
+            users = models.Account.objects.exclude(username=request.user.username)
+        else:
+            users = models.Account.objects.filter(account_type=models.Account.ACCOUNT_TYPE_CUSTOMER)
     else:
         users = [account]
 
@@ -141,6 +144,8 @@ class AccountDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super(AccountDetailView, self).get_context_data(**kwargs)
         context['login_user'] = self.kwargs['account']
+        context['is_superuser'] = self.request.user.is_superuser
+        context['is_admin'] = self.kwargs['is_admin']
         return context
 
 class AccountDeleteView(DeleteView):

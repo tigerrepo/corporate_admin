@@ -1,16 +1,42 @@
-<form method="post" action="{% url 'django.contrib.auth.views.login' %}">
-{% csrf_token %}
-<table>
-<tr>
-    <td>{{ form.username.label_tag }}</td>
-    <td>{{ form.username }}</td>
-</tr>
-<tr>
-    <td>{{ form.password.label_tag }}</td>
-    <td>{{ form.password }}</td>
-</tr>
-</table>
+{% extends "base_empty.html" %}
 
-<input type="submit" value="login" />
-<input type="hidden" name="next" value="{{ next }}" />
-</form>
+{% block content %}
+<div class="container">
+
+  <div class="mws-panel grid_6">
+    <div class="mws-panel-header">
+      <h1 style="color:#f0f0f0; line-height:30px;">Welcome to Rice Global</h1>
+    </div>
+    <div class="mws-panel-body">
+      <form id="mws-validate" class="mws-form" action="{% url 'django.contrib.auth.views.login' %}" method="post" novalidate="novalidate">
+        {% csrf_token %}
+        <div id="mws-validate-error" class="mws-form-message error" style="display:none;"></div>
+        <div class="mws-form-inline">
+          <div class="mws-form-row" style="padding-top:20px; padding-bottom:0">
+            <label>User Name</label>
+
+            <div class="mws-form-item medium">
+              <input class="mws-textinput" id="id_username" maxlength="64" name="username" type="text">
+
+            </div>
+          </div>
+
+          <div class="mws-form-row" style="padding-top:20px; padding-bottom:0">
+            <label>Password</label>
+
+            <div class="mws-form-item medium">
+              <input class="mws-textinput" id="id_password" name="password" type="password">
+
+            </div>
+          </div>
+          <input type="hidden" name="next" value="{{ next }}" />
+          <div class="mws-button-row" style="padding:8px; background:none;border:none;">
+            <input type="submit" class="mws-button green large" value="Login">
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

@@ -90,7 +90,7 @@ urlpatterns = patterns('',
 
     url(r'^$', 'tiger_admin.views.home', name='home'),
     url(r'^login/$', auth_views.login, {'template_name':'login.html'}, name='login'),
-    url(r'^logout/$', auth_views.logout, {'template_name':'logout.html'},name='logout'),
+    url(r'^logout/$', auth_views.logout, {'template_name':'login.html'},name='logout'),
 
     # admin
     url(r'^admin/$', 'tiger_admin.views.admin_list', name='admin-list'),

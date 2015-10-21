@@ -20,7 +20,8 @@ CREATE TABLE `company_tab` (
     `valid_from` datetime NOT NULL,
     `valid_to` datetime NOT NULL,
     `status` smallint NOT NULL,
-    `account_id` integer NOT NULL
+    `account_id` integer NOT NULL,
+    `pdf_url` varchar(64) NOT NULL DEFAULT ''
 )
 ;
 ALTER TABLE `company_tab` ADD CONSTRAINT `account_id_refs_id_002207d9` FOREIGN KEY (`account_id`) REFERENCES `account_tab` (`id`);
@@ -48,7 +49,8 @@ CREATE TABLE `contact_tab` (
 ALTER TABLE `contact_tab` ADD CONSTRAINT `company_id_refs_id_71463fd0` FOREIGN KEY (`company_id`) REFERENCES `company_tab` (`id`);
 CREATE TABLE `tag_tab` (
     `id` integer AUTO_INCREMENT NOT NULL PRIMARY KEY,
-    `name` varchar(32) NOT NULL UNIQUE
+    `name` varchar(32) NOT NULL UNIQUE,
+    `status` smallint NOT NULL
 )
 ;
 CREATE TABLE `company_tag_tab` (

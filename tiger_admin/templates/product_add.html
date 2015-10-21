@@ -3,7 +3,9 @@
 {% block content %}
 <div class="mws-panel grid_6">
     <div class="mws-panel-header">
+      {% if can_add %}
         <span class="mws-i-24 i-pencil">Create Product</span>
+      {% endif %}
     </div>
     <div class="mws-panel-body">
         <form id="mws-validate" class="mws-form" action="" method="post">

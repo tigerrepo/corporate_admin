@@ -26,7 +26,9 @@ def check_corporate_permission(func):
             account = models.Account.objects.get(username__exact=request.user.username)
             kwargs['is_admin'] = account.account_type == models.Account.ACCOUNT_TYPE_ADMIN
             kwargs['account'] = account
-            if kwargs['is_admin'] or models.Company.objects.get(pk=corporate_pk, account=account):
+            kwargs['is_superuser'] = request.user.is_superuser
+            kwargs['is_owner'] = models.Company.objects.filter(pk=corporate_pk, account=account).exists()
+            if kwargs['is_admin'] or kwargs['is_owner']:
                 return func(request, *args, **kwargs)
         except models.Company.DoesNotExist:
             return HttpResponseForbidden()
@@ -41,7 +43,7 @@ def check_product_permission(func):
             kwargs['is_admin'] = account.account_type == models.Account.ACCOUNT_TYPE_ADMIN
             kwargs['account'] = account
             companies = list(c.id for c in models.Company.objects.filter(account=account))
-            if kwargs['is_admin'] or models.Product.objects.get(pk=pk, company__in=companies):
+            if kwargs['is_admin'] or models.Product.objects.get(pk=pk, company_id__in=companies):
                 return func(request, *args, **kwargs)
         except models.Product.DoesNotExist:
             return HttpResponseForbidden()
@@ -72,7 +74,7 @@ def check_message_permission(func):
             account = models.Account.objects.get(username__exact=request.user.username)
             kwargs['is_admin'] = account.account_type == models.Account.ACCOUNT_TYPE_ADMIN
             kwargs['account'] = account
-            if models.Contact.objects.get(pk=pk, account=account):
+            if kwargs['is_admin'] or models.Contact.objects.get(pk=pk, account=account):
                 return func(request, *args, **kwargs)
         except models.Contact.DoesNotExist:
             return HttpResponseForbidden()
@@ -110,7 +112,7 @@ urlpatterns = patterns('',
 
     # corporate
     url(r'^corporate/$',
-        check_user_role(login_required(views.CompanyListView.as_view())),
+        login_required(views.CompanyListView.as_view()),
         name='company-list'),
     url(r'^corporate/(?P<pk>\d+)/detail/$',
         check_corporate_permission(login_required(views.CompanyDetailView.as_view())),
@@ -122,28 +124,46 @@ urlpatterns = patterns('',
     url(r'^corporate/(?P<pk>\d+)/delete/$',
         check_corporate_permission(login_required(views.CompanyDeleteView.as_view())),
         name='company-delete'),
-    url(r'^corporate/add/$',
-        check_corporate_permission(login_required(views.CompanyCreateView.as_view())),
+    url(r'^corporate/add/$', login_required(views.CompanyCreateView.as_view()),
         name='company-add'),
     url(r'^corporate/(?P<pk>\d+)/product/$',
         check_corporate_permission(login_required(views.CompanyProductListView.as_view())),
         name='company-product-list'),
-    url(r'^corporate/(?P<pk>\d+)/message/$', check_corporate_permission(login_required(views.CompanyMessageListView.as_view())),
+    url(r'^corporate/(?P<pk>\d+)/message/$',
+        check_corporate_permission(login_required(views.CompanyMessageListView.as_view())),
         name='company-message-list'),
 
     # tag
-    url(r'^category/$', login_required(views.CategoryListView.as_view()), name='category-list'),
-    url(r'^category/add/$', login_required(views.CategoryCreateView.as_view()), name='category-add'),
-    url(r'^category/(?P<pk>\d+)/detail/$', login_required(views.CategoryDetailView.as_view()), name='category-detail'),
-    url(r'^category/(?P<pk>\d+)/update/$', login_required(views.CategoryUpdateView.as_view()), name='category-update'),
-    url(r'^category/(?P<pk>\d+)/delete/$', login_required(views.CategoryDeleteView.as_view()), name='category-delete'),
+    url(r'^category/$',
+        check_user_role(login_required(views.CategoryListView.as_view())),
+        name='category-list'),
+    url(r'^category/add/$',
+        check_user_role(login_required(views.CategoryCreateView.as_view())),
+        name='category-add'),
+    url(r'^category/(?P<pk>\d+)/detail/$',
+        check_user_role(login_required(views.CategoryDetailView.as_view())),
+        name='category-detail'),
+    url(r'^category/(?P<pk>\d+)/update/$',
+        check_user_role(login_required(views.CategoryUpdateView.as_view())),
+        name='category-update'),
+    url(r'^category/(?P<pk>\d+)/delete/$',
+        check_user_role(login_required(views.CategoryDeleteView.as_view())),
+        name='category-delete'),
 
     # product
-    url(r'^product/$', login_required(views.ProductListView.as_view()), name='product-list'),
+    url(r'^product/$',
+        (login_required(views.ProductListView.as_view())),
+        name='product-list'),
     url(r'^product/add/$', login_required(views.ProductCreateView.as_view()), name='product-add'),
-    url(r'^product/(?P<pk>\d+)/detail/$', login_required(views.ProductDetailView.as_view()), name='product-detail'),
-    url(r'^product/(?P<pk>\d+)/update/$', login_required(views.ProductUpdateView.as_view()), name='product-update'),
-    url(r'^product/(?P<pk>\d+)/delete/$', login_required(views.ProductDeleteView.as_view()), name='product-delete'),
+    url(r'^product/(?P<pk>\d+)/detail/$',
+        check_product_permission(login_required(views.ProductDetailView.as_view())),
+        name='product-detail'),
+    url(r'^product/(?P<pk>\d+)/update/$',
+        check_product_permission(login_required(views.ProductUpdateView.as_view())),
+        name='product-update'),
+    url(r'^product/(?P<pk>\d+)/delete/$',
+        check_product_permission(login_required(views.ProductDeleteView.as_view())),
+        name='product-delete'),
 
     # gallery
     url(r'^product/(?P<ppk>\d+)/gallery/$', login_required(views.ProductImageListView.as_view()), name='product-image-list'),
@@ -153,6 +173,10 @@ urlpatterns = patterns('',
     url(r'^product/(?P<ppk>\d+)/gallery/(?P<pk>\d+)/update/$', login_required(views.GalleryUpdateView.as_view()), name='gallery-update'),
 
     # message
-    url(r'^message/$', login_required(views.MessageListView.as_view()), name='message-list'),
-    url(r'^message/(?P<pk>\d+)/detail/$', login_required(views.MessageDetailView.as_view()), name='message-detail'),
+    url(r'^message/$',
+        login_required(views.MessageListView.as_view()),
+        name='message-list'),
+    url(r'^message/(?P<pk>\d+)/detail/$',
+        check_message_permission(login_required(views.MessageDetailView.as_view())),
+        name='message-detail'),
 )

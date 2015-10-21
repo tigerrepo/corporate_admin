@@ -9,8 +9,8 @@
         <div class="mws-panel-toolbar top clearfix">
         	<ul>
         	    <li><a href="#" class="mws-ic-16 ic-arrow-left" onclick="javascript:window.history.back(); return false;">Back</a></li>
-                {% if is_admin %}
             	    <li><a href='{% url "category-update" object.pk %}' class="mws-ic-16 ic-pencil">Edit Info</a></li>
+                {% if is_superuser %}
                     <li><a href='{% url "category-delete" object.pk %}' class="mws-ic-16 ic-delete">Delete</a></li>
                 {% endif %}
             </ul>
@@ -22,6 +22,11 @@
                     <td>Name</td>
                     <td>{{object.name}}</td>
                 </tr>
+                <tr class="gradeX">
+                    <td>Status</td>
+                    <td>{{object.get_status_display}}</td>
+                </tr>
+
             </tbody>
         </table>
     </div>

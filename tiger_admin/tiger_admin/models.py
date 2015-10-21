@@ -67,6 +67,7 @@ class Company(models.Model):
     valid_to = models.DateTimeField()
     status = models.SmallIntegerField(choices=Account.STATUS_CHOICES, default=Account.STATUS_DISABLE)
     account = models.ForeignKey(Account, on_delete=models.PROTECT)
+    pdf_url = models.CharField(max_length=64)
 
     class Meta:
         db_table = "company_tab"
@@ -101,7 +102,7 @@ class Contact(models.Model):
 
 class Tag(models.Model):
     name = models.CharField(max_length=32, unique=True)
-
+    status = models.SmallIntegerField(choices=Account.STATUS_CHOICES, default=1)
     class Meta:
         db_table = 'tag_tab'
 

@@ -96,7 +96,9 @@ $(document).ready(function() {
 
                 <select name="account_type">
                     <option value="1">Customer Account</option>
+                    {% if is_superuser %}
                     <option value="0">Admin Account</option>
+                    {% endif %}
                 </select>
             </div>
         </div>

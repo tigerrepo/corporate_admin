@@ -52,7 +52,7 @@ def admin_list(request):
             'is_admin' : is_admin,
             'page_title': 'Admins',
             'users': users,
-            'account_type': dict(models.Account.ACCOUNT_TYPE_CHOICES)
+            'is_superuser': request.user.is_superuser
         },
         context_instance=RequestContext(request)
     )
@@ -205,8 +205,8 @@ class CompanyListView(ListView):
     def get_context_data(self, **kwargs):
         context = super(CompanyListView, self).get_context_data(**kwargs)
 
-        account = self.kwargs['account']
-        is_admin = self.kwargs['is_admin']
+        account = models.Account.objects.get(username__exact=self.request.user.username)
+        is_admin = account.account_type == models.Account.ACCOUNT_TYPE_ADMIN
         if is_admin:
             company_list = models.Company.objects.all()
         else:
@@ -303,6 +303,7 @@ class CompanyProductListView(ListView):
         pk = self.kwargs.get('pk', 0)
         company = get_object_or_404(models.Company, pk=pk)
         context['object_list'] = models.Product.objects.filter(company=company)
+        context['can_add'] = self.kwargs['is_superuser'] or self.kwargs['is_owner']
         return context
 
 class CompanyMessageListView(ListView):
@@ -350,9 +351,7 @@ class CategoryListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(CategoryListView, self).get_context_data(**kwargs)
-        account = models.Account.objects.get(username=self.request.user.username)
-        is_admin = account.account_type == models.Account.ACCOUNT_TYPE_ADMIN
-        context['is_admin'] = is_admin
+        context['is_admin'] = self.kwargs['is_admin']
         return context
 
 class CategoryDetailView(DetailView):
@@ -361,9 +360,7 @@ class CategoryDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(CategoryDetailView, self).get_context_data(**kwargs)
-        account = models.Account.objects.get(username=self.request.user.username)
-        is_admin = account.account_type == models.Account.ACCOUNT_TYPE_ADMIN
-        context['is_admin'] = is_admin
+        context['is_superuser'] = self.request.user.is_superuser
         return context
 
 class CategoryDeleteView(DeleteView):
@@ -406,9 +403,12 @@ class ProductListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(ProductListView, self).get_context_data(**kwargs)
-        account = models.Account.objects.get(username=self.request.user.username)
+        account = models.Account.objects.get(username__exact=self.request.user.username)
         is_admin = account.account_type == models.Account.ACCOUNT_TYPE_ADMIN
-        context['is_admin'] = is_admin
+        if not is_admin:
+            companies = list(c.id for c in models.Company.objects.filter(account=account))
+            context['object_list'] = models.Product.objects.filter(company_id__in=companies)
+        context['can_add'] = self.request.user.is_superuser or not is_admin
         return context
 
 class ProductDetailView(DetailView):

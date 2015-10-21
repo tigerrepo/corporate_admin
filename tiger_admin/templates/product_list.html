@@ -7,7 +7,7 @@
         <span class="mws-i-24 i-table-1">Product List</span>
     </div>
     <div class="mws-panel-body">
-        {% if not is_admin %}
+        {% if can_add %}
         <div class="mws-panel-toolbar top clearfix">
             <ul>
               <li><a href='{% url "product-add" %}' class="mws-ic-16 ic-add">Create Product</a></li>

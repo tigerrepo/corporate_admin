@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block content %}
+<div class="mws-panel grid_8">
+    <div class="mws-panel-header">
+        <span class="mws-i-24 i-table-1">Message List</span>
+    </div>
+    <div class="mws-panel-body">
+        <table class="mws-datatable-fn mws-table" id="datatable">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Content</th>
+                    <th>Create Date</th>
+                    <th>Sender</th>
+                    <th>Mobile</th>
+                    <th>Company</th>
+                    <th>Detail</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in object_list %}
+                <tr class="gradeX">
+                    <td>{{ c.title }}</td>
+                    <td>{{ c.content }}</td>
+                    <td>{{ c.create_date }}</td>
+                    <td>{{ c.sender }}</td>
+                    <td>{{ c.mobile }}</td>
+                    <td>{{ c.company }}</td>
+                    <td><a href='{% url "message-detail" c.pk %}'><img src="{% static 'css/icons/16/view.png' %}" alt="Detail" width="24" height="24" border="0"></a></td>
+                </tr>
+ 
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

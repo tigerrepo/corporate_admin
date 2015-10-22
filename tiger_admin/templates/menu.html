@@ -10,12 +10,11 @@
     <a class="mws-i-24 i-laptop" href="#">{% trans "Corporate Management" %}</a>
     <ul>
       <li><a href="{% url 'company-list' %}">{% trans "Manage Corporate" %}</a></li>
-      <!--<li><a href="">{% trans "Manage Video" %}</a></li>-->
       <li><a href="{% url 'product-list' %}">{% trans "Manage Product" %}</a></li>
     </ul>
   </li>
   <li>
-    <a class="mws-i-24 i-new-message" href="#">{% trans "Category Management" %}</a>
+    <a class="mws-i-24 i-tag" href="#">{% trans "Category Management" %}</a>
     <ul>
       <li><a href="{% url 'category-list' %}">{% trans "Category List" %}</a></li>
     </ul>
@@ -23,7 +22,7 @@
   <li>
     <a class="mws-i-24 i-new-message" href="#">{% trans "Message Box" %}</a>
     <ul>
-      <li><a href="">{% trans "Message List" %}</a></li>
+      <li><a href="{% url 'message-list' %}">{% trans "Message List" %}</a></li>
     </ul>
   </li>
 </ul>

@@ -93,8 +93,8 @@ def password_reset(request, pk):
     u.set_password(password)
     u.save()
 
-    logger.info("Account %s has been reset password, done by %s",
-                account.username, request.user)
+    logger.info("Account %s has been reset password %s, done by %s",
+                account.username, password, request.user)
     if settings.SENT_EMAIL:
         send_mail('TEST SUB', 'message', settings.EMAIL_HOST_USER,
                 [settings.DEFAULT_TO_EMAIL], fail_silently=False)
@@ -140,8 +140,7 @@ class AccountDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(AccountDetailView, self).get_context_data(**kwargs)
-        account = models.Account.objects.get(username=self.request.user.username)
-        context['login_user'] = account
+        context['login_user'] = self.kwargs['account']
         return context
 
 class AccountDeleteView(DeleteView):
@@ -185,9 +184,13 @@ class AccountCompanyListView(ListView):
     def get_context_data(self, **kwargs):
         pk = self.kwargs.get('pk', 0)
         context = super(AccountCompanyListView, self).get_context_data(**kwargs)
+        login_account = models.Account.objects.get(username=self.request.user.username)
+        is_admin = login_account.account_type == models.Account.ACCOUNT_TYPE_ADMIN
+
         account = get_object_or_404(models.Account, pk=pk)
         context['company_list'] = models.Company.objects.filter(account=account)
         context['domain'] = settings.DOMAIN_NAME
+        context['is_admin'] = is_admin
         return context
 
 class CompanyListView(ListView):
@@ -207,9 +210,12 @@ class CompanyListView(ListView):
 
         company_tag_dict = collections.defaultdict(list)
         for company_tag in models.CompanyTag.objects.select_related("Tag").all():
+            print company_tag.company_id, company_tag.tag_id
             company_tag_dict[company_tag.company_id].append(company_tag.tag.name)
 
         company_list_with_tag = []
+        print company_list
+        print company_tag_dict
         for company in company_list:
             company_dict = {}
             company_dict['name'] = company.name
@@ -218,7 +224,7 @@ class CompanyListView(ListView):
             company_dict['status'] = company.get_status_display
             company_dict['pk'] = company.id
             company_dict['create_time'] = company.create_time
-            company_dict['tag'] = ','.join(company_tag_dict.get(company.id))
+            company_dict['tag'] = ','.join(company_tag_dict.get(company.id, []))
             company_list_with_tag.append(company_dict)
 
         context['is_admin'] = is_admin
@@ -246,8 +252,7 @@ class CompanyCreateView(CreateView):
             return super(CompanyCreateView, self).form_invalid(form)
 
         logger.info("Website %s has been created by %s", form.cleaned_data['name'], self.request.user)
-        context = self.get_context_data()
-        return render(self.request, 'company_list.html', context)
+        return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):
         return reverse('company-list')
@@ -266,7 +271,7 @@ class CompanyDetailView(DetailView):
         for company_tag in models.CompanyTag.objects.select_related("Tag").all():
             company_tag_dict[company_tag.company_id].append(company_tag.tag.name)
 
-        context['tag'] = ','.join(company_tag_dict.get(self.object.pk))
+        context['tag'] = ','.join(company_tag_dict.get(self.object.pk, []))
 
         context['is_admin'] = is_admin
         return context
@@ -299,8 +304,35 @@ class CompanyProductListView(ListView):
         context['object_list'] = models.Product.objects.filter(company=company)
         return context
 
-class CompanyVideoListView(ListView):
-    pass
+class CompanyMessageListView(ListView):
+    model = models.Contact
+    template_name = 'message_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(CompanyMessageListView, self).get_context_data(**kwargs)
+        pk = self.kwargs.get('pk', 0)
+        company = get_object_or_404(models.Company, pk=pk)
+        context['object_list'] = models.Contact.objects.filter(company=company)
+        return context
+
+class MessageListView(ListView):
+    model = models.Contact
+    template_name = 'message_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(MessageListView, self).get_context_data(**kwargs)
+        account = models.Account.objects.get(username=self.request.user.username)
+        is_admin = account.account_type == models.Account.ACCOUNT_TYPE_ADMIN
+        if is_admin:
+            context['object_list'] = models.Contact.objects.all()
+        else:
+            companies = models.Company.objects.filter(account=account)
+            context['object_list'] = models.Contact.objects.filter(company__in=companies)
+        return context
+
+class MessageDetailView(DetailView):
+    model = models.Contact
+    template_name = 'message_detail.html'
 
 class CategoryCreateView(CreateView):
     model = models.Tag

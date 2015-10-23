@@ -26,7 +26,7 @@ def check_corporate_permission(func):
             account = models.Account.objects.get(username__exact=request.user.username)
             kwargs['is_admin'] = account.account_type == models.Account.ACCOUNT_TYPE_ADMIN
             kwargs['account'] = account
-            if models.Company.objects.get(pk=corporate_pk, account=account):
+            if kwargs['is_admin'] or models.Company.objects.get(pk=corporate_pk, account=account):
                 return func(request, *args, **kwargs)
         except models.Company.DoesNotExist:
             return HttpResponseForbidden()
@@ -41,7 +41,7 @@ def check_product_permission(func):
             kwargs['is_admin'] = account.account_type == models.Account.ACCOUNT_TYPE_ADMIN
             kwargs['account'] = account
             companies = list(c.id for c in models.Company.objects.filter(account=account))
-            if models.Product.objects.get(pk=pk, company__in=companies):
+            if kwargs['is_admin'] or models.Product.objects.get(pk=pk, company__in=companies):
                 return func(request, *args, **kwargs)
         except models.Product.DoesNotExist:
             return HttpResponseForbidden()
@@ -57,7 +57,7 @@ def check_gallery_permission(func):
             kwargs['account'] = account
             companies = list(c.id for c in models.Company.objects.filter(account=account))
             products = list(p.id for p in models.Product.objects.filter(company__in=companies))
-            if models.Gallery.objects.get(pk=pk, product__in=products):
+            if kwargs['is_admin'] or models.Gallery.objects.get(pk=pk, product__in=products):
                 return func(request, *args, **kwargs)
         except models.Gallery.DoesNotExist:
             return HttpResponseForbidden()
@@ -97,20 +97,39 @@ urlpatterns = patterns('',
         check_user_role(login_required(views.AccountDetailView.as_view())),
         name='admin-detail'),
     url(r'^admin/(?P<pk>\d+)/update_status/$', 'tiger_admin.views.update_status', name='admin-update-status'),
-    url(r'^admin/(?P<pk>\d+)/delete/$', login_required(views.AccountDeleteView.as_view()), name='admin-delete'),
-    url(r'^admin/(?P<pk>\d+)/password_change/$', login_required(views.AccountPasswordResetView.as_view()), name='admin-change-password'),
+    url(r'^admin/(?P<pk>\d+)/delete/$',
+        check_user_role(login_required(views.AccountDeleteView.as_view())),
+        name='admin-delete'),
+    url(r'^admin/(?P<pk>\d+)/password_change/$',
+        check_user_role(login_required(views.AccountPasswordResetView.as_view())),
+        name='admin-change-password'),
     url(r'^admin/(?P<pk>\d+)/password_reset/$', 'tiger_admin.views.password_reset', name='admin-reset-password'),
-    url(r'^admin/(?P<pk>\d+)/company/$', login_required(views.AccountCompanyListView.as_view()), name='admin-company-list'),
+    url(r'^admin/(?P<pk>\d+)/company/$',
+        check_user_role(login_required(views.AccountCompanyListView.as_view())),
+        name='admin-company-list'),
 
     # corporate
-    url(r'^corporate/$', login_required(views.CompanyListView.as_view()), name='company-list'),
-    url(r'^corporate/(?P<pk>\d+)/detail/$', check_user_role(login_required(views.CompanyDetailView.as_view())), name='company-detail'),
-    url(r'^corporate/(?P<pk>\d+)/update/$', login_required(views.CompanyUpdateView.as_view()), name='company-update'),
+    url(r'^corporate/$',
+        check_user_role(login_required(views.CompanyListView.as_view())),
+        name='company-list'),
+    url(r'^corporate/(?P<pk>\d+)/detail/$',
+        check_corporate_permission(login_required(views.CompanyDetailView.as_view())),
+        name='company-detail'),
+    url(r'^corporate/(?P<pk>\d+)/update/$',
+        check_corporate_permission(login_required(views.CompanyUpdateView.as_view())),
+        name='company-update'),
     url(r'^corporate/(?P<pk>\d+)/update_status/$', 'tiger_admin.views.update_company_status', name='company-update-status'),
-    url(r'^corporate/(?P<pk>\d+)/delete/$', login_required(views.CompanyDeleteView.as_view()), name='company-delete'),
-    url(r'^corporate/add/$', login_required(views.CompanyCreateView.as_view()), name='company-add'),
-    url(r'^corporate/(?P<pk>\d+)/product/$', login_required(views.CompanyProductListView.as_view()), name='company-product-list'),
-    url(r'^corporate/(?P<pk>\d+)/message/$', login_required(views.CompanyMessageListView.as_view()), name='company-message-list'),
+    url(r'^corporate/(?P<pk>\d+)/delete/$',
+        check_corporate_permission(login_required(views.CompanyDeleteView.as_view())),
+        name='company-delete'),
+    url(r'^corporate/add/$',
+        check_corporate_permission(login_required(views.CompanyCreateView.as_view())),
+        name='company-add'),
+    url(r'^corporate/(?P<pk>\d+)/product/$',
+        check_corporate_permission(login_required(views.CompanyProductListView.as_view())),
+        name='company-product-list'),
+    url(r'^corporate/(?P<pk>\d+)/message/$', check_corporate_permission(login_required(views.CompanyMessageListView.as_view())),
+        name='company-message-list'),
 
     # tag
     url(r'^category/$', login_required(views.CategoryListView.as_view()), name='category-list'),

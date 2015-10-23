@@ -78,7 +78,9 @@ def update_status(request, pk):
                 account.username, account.status, request.user)
     return redirect(reverse('admin-detail', kwargs={'pk':pk}))
 
+@login_required
 def update_company_status(request, pk):
+    #check company owner or admin
     company = models.Company.objects.get(pk=pk)
     company.status = not company.status
     company.save()
@@ -189,13 +191,11 @@ class AccountCompanyListView(ListView):
     def get_context_data(self, **kwargs):
         pk = self.kwargs.get('pk', 0)
         context = super(AccountCompanyListView, self).get_context_data(**kwargs)
-        login_account = models.Account.objects.get(username=self.request.user.username)
-        is_admin = login_account.account_type == models.Account.ACCOUNT_TYPE_ADMIN
 
         account = get_object_or_404(models.Account, pk=pk)
         context['company_list'] = models.Company.objects.filter(account=account)
         context['domain'] = settings.DOMAIN_NAME
-        context['is_admin'] = is_admin
+        context['is_admin'] = self.kwargs['is_admin']
         return context
 
 class CompanyListView(ListView):
@@ -205,9 +205,8 @@ class CompanyListView(ListView):
     def get_context_data(self, **kwargs):
         context = super(CompanyListView, self).get_context_data(**kwargs)
 
-        account = models.Account.objects.get(username=self.request.user.username)
-
-        is_admin = account.account_type == models.Account.ACCOUNT_TYPE_ADMIN
+        account = self.kwargs['account']
+        is_admin = self.kwargs['is_admin']
         if is_admin:
             company_list = models.Company.objects.all()
         else:
@@ -215,12 +214,9 @@ class CompanyListView(ListView):
 
         company_tag_dict = collections.defaultdict(list)
         for company_tag in models.CompanyTag.objects.select_related("Tag").all():
-            print company_tag.company_id, company_tag.tag_id
             company_tag_dict[company_tag.company_id].append(company_tag.tag.name)
 
         company_list_with_tag = []
-        print company_list
-        print company_tag_dict
         for company in company_list:
             company_dict = {}
             company_dict['name'] = company.name
@@ -269,8 +265,8 @@ class CompanyDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super(CompanyDetailView, self).get_context_data(**kwargs)
         context['domain'] = settings.DOMAIN_NAME
-        account = models.Account.objects.get(username=self.request.user.username)
-        is_admin = account.account_type == models.Account.ACCOUNT_TYPE_ADMIN
+        account = self.kwargs['account']
+        is_admin = self.kwargs['is_admin']
 
         company_tag_dict = collections.defaultdict(list)
         for company_tag in models.CompanyTag.objects.select_related("Tag").all():

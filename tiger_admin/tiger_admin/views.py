@@ -23,6 +23,7 @@ from django.views.generic.list import ListView
 
 from tiger_admin import forms, models, settings
 from utils import format_date, generate_random_password, upload_image
+from django.db.models import Q
 
 logger = logging.getLogger('main')
 
@@ -101,8 +102,8 @@ def password_reset(request, pk):
     logger.info("Account %s has been reset password %s, done by %s",
                 account.username, password, request.user)
     if settings.SENT_EMAIL:
-        send_mail('TEST SUB', 'message', settings.EMAIL_HOST_USER,
-                [settings.DEFAULT_TO_EMAIL], fail_silently=False)
+        send_mail('Notification', 'Your password is reset to %s, please login and change your password.' % password, settings.EMAIL_HOST_USER,
+                [account.email], fail_silently=False)
     return redirect(reverse('admin-detail', kwargs={'pk':pk}))
 
 
@@ -113,7 +114,7 @@ def admin_add(request):
     email = request.POST['email'].strip()
     account_type = request.POST['account_type']
     try:
-        account = models.Account.objects.get(username__exact=username)
+        account = models.Account.objects.get(Q(username__exact=username) | Q(email__exact=email))
         if account.status == models.Account.STATUS_DISABLE:
             account.status = models.Account.STATUS_ENABLE
             account.save()
@@ -137,6 +138,10 @@ def admin_add(request):
         u.set_password(password)
         u.save()
         logger.info("Account %s, %s, %s has been created by %s", username, password, account_type, request.user)
+        if settings.SENT_EMAIL:
+            send_mail('Notification', 'Your email is generated, please use %s as password to login. For your safety, please change your password once you login the system' % password,
+                settings.EMAIL_HOST_USER, [email], fail_silently=False)
+
     return redirect('/admin')
 
 class AccountDetailView(DetailView):
@@ -243,9 +248,22 @@ class CompanyCreateView(CreateView):
             with transaction.atomic(using='tiger_admin'):
                 account = models.Account.objects.get(username__exact=self.request.user.username)
                 form.instance.account = account
-                self.object = form.save()
-                tag = form.cleaned_data['tag']
 
+                directory = '%s' % (settings.MEDIA_ROOT)
+                pdf_url = upload_image(form.cleaned_data['pdf_url'], directory)
+                form.instance.pdf_url = pdf_url
+                self.object = form.save()
+
+                video_url = form.cleaned_data['video_url']
+                name = video_url.split("=")[-1]
+                models.Video.objects.create(
+                    name=name,
+                    description='',
+                    video_url=video_url,
+                    host_url='%s/%s.mp4' % (self.object.id, self.object.id),
+                    company=self.object)
+
+                tag = form.cleaned_data['tag']
                 models.CompanyTag.objects.get_or_create(company=self.object, tag=tag)
         except Exception as e:
             logger.error("create Website fail, roll back, website %s, operate by %s", form.cleaned_data['name'], self.request.user)
@@ -279,7 +297,7 @@ class CompanyDetailView(DetailView):
 
 class CompanyUpdateView(UpdateView):
     model = models.Company
-    form_class = forms.CompanyCreateForm
+    form_class = forms.CompanyUpdateForm
     template_name = 'company_update.html'
 
     def get_success_url(self):
@@ -367,8 +385,18 @@ class CategoryDeleteView(DeleteView):
     model = models.Tag
     template_name = 'category_delete_form.html'
 
+    def delete(self, request, *args, **kwargs):
+        try:
+            name = self.get_object().name
+            self.get_object().delete()
+            logger.info("Category %s has been deleted by %s", name, self.request.user)
+            return HttpResponseRedirect(self.get_success_url())
+        except Exception as e:
+            messages.error(request,
+                           'Delete category failed, there are corporates with this tag exists')
+            return HttpResponseRedirect(reverse('category-detail', kwargs={"pk":self.get_object().id}))
+
     def get_success_url(self):
-        logger.info("Category %s has been deleted by %s", self.object.name, self.request.user)
         return reverse('category-list')
 
 class CategoryUpdateView(UpdateView):
@@ -394,7 +422,7 @@ class ProductCreateView(CreateView):
         return context
 
     def get_success_url(self):
-        logger.info("Product %s has been updated by %s", self.object.name, self.request.user)
+        logger.info("Product %s has been created by %s", self.object.name, self.request.user)
         return reverse('product-list')
 
 class ProductListView(ListView):
@@ -426,8 +454,18 @@ class ProductDeleteView(DeleteView):
     model = models.Product
     template_name = 'product_delete_form.html'
 
+    def delete(self, request, *args, **kwargs):
+        try:
+            name = self.get_object().name
+            self.get_object().delete()
+            logger.info("Product %s has been deleted by %s", name, self.request.user)
+            return HttpResponseRedirect(self.get_success_url())
+        except Exception as e:
+            messages.error(request,
+                           'Delete product failed, there are images in this product.')
+            return HttpResponseRedirect(reverse('product-detail', kwargs={"pk":self.get_object().id}))
+
     def get_success_url(self):
-        logger.info("Product %s has been deleted by %s", self.object.name, self.request.user)
         return reverse('product-list')
 
 class ProductUpdateView(UpdateView):
@@ -530,5 +568,4 @@ class GalleryUpdateView(UpdateView):
         pk = self.kwargs.get('ppk', 0)
         logger.info("Image %s has been updated by %s", self.object.id, self.request.user)
         return reverse('gallery-detail', kwargs={'ppk': pk, 'pk':self.object.pk})
-
 

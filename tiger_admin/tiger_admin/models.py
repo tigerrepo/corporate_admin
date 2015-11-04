@@ -30,6 +30,8 @@ class Account(models.Model):
     def __unicode__(self):
         return self.username
 
+
+
 @receiver(pre_save, sender=Account)
 def create_user_if_not_exist(sender, **kwargs):
     instance = kwargs.get('instance')
@@ -67,7 +69,7 @@ class Company(models.Model):
     valid_to = models.DateTimeField()
     status = models.SmallIntegerField(choices=Account.STATUS_CHOICES, default=Account.STATUS_DISABLE)
     account = models.ForeignKey(Account, on_delete=models.PROTECT)
-    pdf_url = models.CharField(max_length=64)
+    pdf_url = models.FileField(upload_to='pdf', max_length=64)
 
     class Meta:
         db_table = "company_tab"

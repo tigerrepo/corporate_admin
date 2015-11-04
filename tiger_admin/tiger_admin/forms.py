@@ -27,6 +27,8 @@ class AccountPasswordResetForm(forms.ModelForm):
 class CompanyCreateForm(forms.ModelForm):
     description = forms.CharField(widget=forms.Textarea)
     tag = forms.ModelChoiceField(queryset=models.Tag.objects.all())
+    video_url = forms.CharField(max_length=128)
+
     def __init__(self, *args, **kwargs):
         super(CompanyCreateForm, self).__init__(*args, **kwargs)
         for field in self:
@@ -37,7 +39,23 @@ class CompanyCreateForm(forms.ModelForm):
 
     class Meta:
         model = models.Company
+        fields = ['name', 'slogan', 'url', 'description', 'pdf_url']
+
+class CompanyUpdateForm(forms.ModelForm):
+    description = forms.CharField(widget=forms.Textarea)
+
+    def __init__(self, *args, **kwargs):
+        super(CompanyUpdateForm, self).__init__(*args, **kwargs)
+        for field in self:
+            field.field.widget.attrs['class']='mws-textinput'
+
+    def clean_url(self):
+        return self.cleaned_data['url'].lower()
+
+    class Meta:
+        model = models.Company
         fields = ['name', 'slogan', 'url', 'description']
+
 
 class CategoryCreateForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):

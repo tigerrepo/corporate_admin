@@ -1,4 +1,20 @@
 {% extends "base.html" %}
+{% block javascript %}
+<script type="text/javascript">
+
+$(document).ready(function() {
+    {% if messages %}
+        {% for message in messages %}
+            noty({
+                type: 'error',
+                text: '{{ message|safe }}'
+            });
+        {% endfor %}
+    {% endif %}
+});
+</script>
+{% endblock %}
+
 
 {% block content %}
 <div class="mws-panel grid_8">

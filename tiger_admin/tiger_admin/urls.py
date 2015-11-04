@@ -72,9 +72,10 @@ def check_message_permission(func):
         try:
             pk = int(kwargs.get('pk', 0))
             account = models.Account.objects.get(username__exact=request.user.username)
+            companies = list(c.id for c in models.Company.objects.filter(account=account))
             kwargs['is_admin'] = account.account_type == models.Account.ACCOUNT_TYPE_ADMIN
             kwargs['account'] = account
-            if kwargs['is_admin'] or models.Contact.objects.get(pk=pk, account=account):
+            if kwargs['is_admin'] or models.Contact.objects.get(pk=pk, company_id__in=companies):
                 return func(request, *args, **kwargs)
         except models.Contact.DoesNotExist:
             return HttpResponseForbidden()
@@ -99,9 +100,9 @@ urlpatterns = patterns('',
         check_user_role(login_required(views.AccountDetailView.as_view())),
         name='admin-detail'),
     url(r'^admin/(?P<pk>\d+)/update_status/$', 'tiger_admin.views.update_status', name='admin-update-status'),
-    url(r'^admin/(?P<pk>\d+)/delete/$',
-        check_user_role(login_required(views.AccountDeleteView.as_view())),
-        name='admin-delete'),
+    # url(r'^admin/(?P<pk>\d+)/delete/$',
+        # check_user_role(login_required(views.AccountDeleteView.as_view())),
+        # name='admin-delete'),
     url(r'^admin/(?P<pk>\d+)/password_change/$',
         check_user_role(login_required(views.AccountPasswordResetView.as_view())),
         name='admin-change-password'),
@@ -121,9 +122,9 @@ urlpatterns = patterns('',
         check_corporate_permission(login_required(views.CompanyUpdateView.as_view())),
         name='company-update'),
     url(r'^corporate/(?P<pk>\d+)/update_status/$', 'tiger_admin.views.update_company_status', name='company-update-status'),
-    url(r'^corporate/(?P<pk>\d+)/delete/$',
-        check_corporate_permission(login_required(views.CompanyDeleteView.as_view())),
-        name='company-delete'),
+    # url(r'^corporate/(?P<pk>\d+)/delete/$',
+        # check_corporate_permission(login_required(views.CompanyDeleteView.as_view())),
+        # name='company-delete'),
     url(r'^corporate/add/$', login_required(views.CompanyCreateView.as_view()),
         name='company-add'),
     url(r'^corporate/(?P<pk>\d+)/product/$',

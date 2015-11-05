@@ -11,7 +11,6 @@
         	    <li><a href="#" class="mws-ic-16 ic-arrow-left" onclick="javascript:window.history.back(); return false;">Back</a></li>
                 {% if not is_admin %}
             	    <li><a href='{% url "company-update" object.pk %}' class="mws-ic-16 ic-pencil">Edit Info</a></li>
-                    <li><a href='{% url "company-delete" object.pk %}' class="mws-ic-16 ic-delete">Delete</a></li>
                 {% endif %}
                 {% if object.status %}
                     <li><a href='{% url "company-update-status" object.pk %}' class="mws-ic-16 ic-pencil">Deactivate</a></li>

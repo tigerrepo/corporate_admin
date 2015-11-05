@@ -21,13 +21,13 @@ def check_user_role(func):
 
 def check_corporate_permission(func):
     def wrap(request, *args, **kwargs):
+        corporate_pk = int(kwargs.get('pk', 0))
+        account = models.Account.objects.get(username__exact=request.user.username)
+        kwargs['is_admin'] = account.account_type == models.Account.ACCOUNT_TYPE_ADMIN
+        kwargs['account'] = account
+        kwargs['is_superuser'] = request.user.is_superuser
+        kwargs['is_owner'] = models.Company.objects.filter(pk=corporate_pk, account=account).exists()
         try:
-            corporate_pk = int(kwargs.get('pk', 0))
-            account = models.Account.objects.get(username__exact=request.user.username)
-            kwargs['is_admin'] = account.account_type == models.Account.ACCOUNT_TYPE_ADMIN
-            kwargs['account'] = account
-            kwargs['is_superuser'] = request.user.is_superuser
-            kwargs['is_owner'] = models.Company.objects.filter(pk=corporate_pk, account=account).exists()
             if kwargs['is_admin'] or kwargs['is_owner']:
                 return func(request, *args, **kwargs)
         except models.Company.DoesNotExist:
@@ -37,52 +37,53 @@ def check_corporate_permission(func):
 
 def check_product_permission(func):
     def wrap(request, *args, **kwargs):
+        pk = int(kwargs.get('pk', 0))
+        account = models.Account.objects.get(username__exact=request.user.username)
+        kwargs['is_admin'] = account.account_type == models.Account.ACCOUNT_TYPE_ADMIN
+        kwargs['account'] = account
+        companies = list(c.id for c in models.Company.objects.filter(account=account))
         try:
-            pk = int(kwargs.get('pk', 0))
-            account = models.Account.objects.get(username__exact=request.user.username)
-            kwargs['is_admin'] = account.account_type == models.Account.ACCOUNT_TYPE_ADMIN
-            kwargs['account'] = account
-            companies = list(c.id for c in models.Company.objects.filter(account=account))
-            if kwargs['is_admin'] or models.Product.objects.get(pk=pk, company_id__in=companies):
-                return func(request, *args, **kwargs)
+            kwargs['is_owner'] = models.Product.objects.get(pk=pk, company_id__in=companies)
         except models.Product.DoesNotExist:
-            return HttpResponseForbidden()
+            kwargs['is_owner'] = False
+        if kwargs['is_admin'] or kwargs['is_owner']:
+            return func(request, *args, **kwargs)
         return HttpResponseForbidden()
     return wrap
 
 def check_gallery_permission(func):
     def wrap(request, *args, **kwargs):
+        pk = int(kwargs.get('pk', 0))
+        account = models.Account.objects.get(username__exact=request.user.username)
+        kwargs['is_admin'] = account.account_type == models.Account.ACCOUNT_TYPE_ADMIN
+        kwargs['account'] = account
+        companies = list(c.id for c in models.Company.objects.filter(account=account))
+        products = list(p.id for p in models.Product.objects.filter(company__in=companies))
         try:
-            corporate_pk = int(kwargs.get('pk', 0))
-            account = models.Account.objects.get(username__exact=request.user.username)
-            kwargs['is_admin'] = account.account_type == models.Account.ACCOUNT_TYPE_ADMIN
-            kwargs['account'] = account
-            companies = list(c.id for c in models.Company.objects.filter(account=account))
-            products = list(p.id for p in models.Product.objects.filter(company__in=companies))
-            if kwargs['is_admin'] or models.Gallery.objects.get(pk=pk, product__in=products):
-                return func(request, *args, **kwargs)
+            kwargs['is_owner'] = models.Gallery.objects.get(pk=pk, product__in=products)
         except models.Gallery.DoesNotExist:
-            return HttpResponseForbidden()
+            kwargs['is_owner'] = False
+
+        if kwargs['is_admin'] or kwargs['is_owner']:
+            return func(request, *args, **kwargs)
         return HttpResponseForbidden()
     return wrap
 
 
 def check_message_permission(func):
     def wrap(request, *args, **kwargs):
+        pk = int(kwargs.get('pk', 0))
+        account = models.Account.objects.get(username__exact=request.user.username)
+        companies = list(c.id for c in models.Company.objects.filter(account=account))
+        kwargs['is_admin'] = account.account_type == models.Account.ACCOUNT_TYPE_ADMIN
+        kwargs['account'] = account
         try:
-            pk = int(kwargs.get('pk', 0))
-            account = models.Account.objects.get(username__exact=request.user.username)
-            companies = list(c.id for c in models.Company.objects.filter(account=account))
-            kwargs['is_admin'] = account.account_type == models.Account.ACCOUNT_TYPE_ADMIN
-            kwargs['account'] = account
             if kwargs['is_admin'] or models.Contact.objects.get(pk=pk, company_id__in=companies):
                 return func(request, *args, **kwargs)
         except models.Contact.DoesNotExist:
             return HttpResponseForbidden()
         return HttpResponseForbidden()
     return wrap
-
-
 
 urlpatterns = patterns('',
     # Examples:
@@ -167,11 +168,21 @@ urlpatterns = patterns('',
         name='product-delete'),
 
     # gallery
-    url(r'^product/(?P<ppk>\d+)/gallery/$', login_required(views.ProductImageListView.as_view()), name='product-image-list'),
-    url(r'^product/(?P<ppk>\d+)/gallery/add/$', login_required(views.GalleryCreateView.as_view()), name='gallery-add'),
-    url(r'^product/(?P<ppk>\d+)/gallery/(?P<pk>\d+)/detail/$', login_required(views.GalleryDetailView.as_view()), name='gallery-detail'),
-    url(r'^product/(?P<ppk>\d+)/gallery/(?P<pk>\d+)/delete/$', login_required(views.GalleryDeleteView.as_view()), name='gallery-delete'),
-    url(r'^product/(?P<ppk>\d+)/gallery/(?P<pk>\d+)/update/$', login_required(views.GalleryUpdateView.as_view()), name='gallery-update'),
+    url(r'^product/(?P<pk>\d+)/gallery/$',
+        check_product_permission(login_required(views.ProductImageListView.as_view())),
+        name='product-image-list'),
+    url(r'^product/(?P<pk>\d+)/gallery/add/$',
+        check_product_permission(login_required(views.GalleryCreateView.as_view())),
+        name='gallery-add'),
+    url(r'^product/(?P<ppk>\d+)/gallery/(?P<pk>\d+)/detail/$',
+        check_gallery_permission(login_required(views.GalleryDetailView.as_view())),
+        name='gallery-detail'),
+    url(r'^product/(?P<ppk>\d+)/gallery/(?P<pk>\d+)/delete/$',
+        check_gallery_permission(login_required(views.GalleryDeleteView.as_view())),
+        name='gallery-delete'),
+    url(r'^product/(?P<ppk>\d+)/gallery/(?P<pk>\d+)/update/$',
+        check_gallery_permission(login_required(views.GalleryUpdateView.as_view())),
+        name='gallery-update'),
 
     # message
     url(r'^message/$',

@@ -9,7 +9,7 @@
         <div class="mws-panel-toolbar top clearfix">
           <ul>
               <li><a href="#" class="mws-ic-16 ic-arrow-left" onclick="javascript:window.history.back(); return false;">Back</a></li>
-              {% if is_admin %}
+              {% if is_superuser %}
                 {% if object.status %}
                 <li><a href='{% url "admin-update-status" object.pk %}' class="mws-ic-16 ic-pencil">Deactivate</a></li>
                 {% else %}
@@ -19,10 +19,9 @@
               {% else %}
                 <li><a href='{% url "admin-change-password" object.pk %}' class="mws-ic-16 ic-change-password">Change Password</a></li>
               {% endif %}
-              {% if is_superuser %}
-                <li><a href='{% url "admin-delete" object.pk %}' class="mws-ic-16 ic-delete">Delete</a></li>
-              {% endif %}
+              {% if object.account_type == 1 %}
               <li><a href='{% url "admin-company-list" object.pk %}' class="mws-ic-16 ic-group">Company List</a></li>
+              {% endif %}
             </ul>
         </div>
         <table class="mws-table" id="datatable">

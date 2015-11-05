@@ -43,7 +43,8 @@ def admin_list(request):
         if request.user.is_superuser:
             users = models.Account.objects.exclude(username=request.user.username)
         else:
-            users = models.Account.objects.filter(account_type=models.Account.ACCOUNT_TYPE_CUSTOMER)
+            users = list(models.Account.objects.filter(account_type=models.Account.ACCOUNT_TYPE_CUSTOMER))
+            users.append(account)
     else:
         users = [account]
 
@@ -482,7 +483,7 @@ class ProductImageListView(ListView):
     template_name = 'gallery_list.html'
 
     def get_context_data(self, **kwargs):
-        pk = self.kwargs.get('ppk', 0)
+        pk = self.kwargs.get('pk', 0)
         context = super(ProductImageListView, self).get_context_data(**kwargs)
         context['gallery_list'] = models.Gallery.objects.filter(product_id=pk)
         context['product'] = pk
@@ -505,7 +506,7 @@ class GalleryCreateView(CreateView):
 
     def form_valid(self, form):
         try:
-            pk = self.kwargs.get('ppk', 0)
+            pk = self.kwargs.get('pk', 0)
             product = get_object_or_404(models.Product, pk=pk)
             if form.cleaned_data['is_cover']:
                 models.Gallery.objects.filter(product_id=pk).update(is_cover=False)
@@ -520,9 +521,9 @@ class GalleryCreateView(CreateView):
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):
-        pk = self.kwargs.get('ppk', 0)
+        pk = self.kwargs.get('pk', 0)
         logger.info("Image has been uploaded by %s", self.request.user)
-        return reverse('product-image-list', kwargs={'ppk': pk})
+        return reverse('product-image-list', kwargs={'pk': pk})
 
 class GalleryDetailView(DetailView):
     model = models.Gallery

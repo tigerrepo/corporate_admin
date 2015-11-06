@@ -21,7 +21,7 @@ CREATE TABLE `company_tab` (
     `valid_to` datetime NOT NULL,
     `status` smallint NOT NULL,
     `account_id` integer NOT NULL,
-    `pdf_url` varchar(64) NOT NULL DEFAULT ''
+    `pdf_url` varchar(64) NOT NULL
 )
 ;
 ALTER TABLE `company_tab` ADD CONSTRAINT `account_id_refs_id_002207d9` FOREIGN KEY (`account_id`) REFERENCES `account_tab` (`id`);
@@ -69,6 +69,7 @@ CREATE TABLE `product_tab` (
     `description` varchar(512) NOT NULL,
     `create_date` datetime NOT NULL,
     `status` smallint NOT NULL,
+    `pdf_url` varchar(64) NOT NULL,
     UNIQUE (`company_id`, `name`)
 )
 ;

@@ -9,4 +9,8 @@ server {
         location /video {
             alias /var/www/cdn.riceglobal.com/video;
         }
+        location /pdf {
+            alias /var/www/cdn.riceglobal.com/pdf;
+        }
+
 }

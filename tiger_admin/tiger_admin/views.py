@@ -250,9 +250,6 @@ class CompanyCreateView(CreateView):
                 account = models.Account.objects.get(username__exact=self.request.user.username)
                 form.instance.account = account
 
-                directory = '%s' % (settings.MEDIA_ROOT)
-                pdf_url = upload_image(form.cleaned_data['pdf_url'], directory)
-                form.instance.pdf_url = pdf_url
                 self.object = form.save()
 
                 video_url = form.cleaned_data['video_url']
@@ -410,7 +407,7 @@ class CategoryUpdateView(UpdateView):
         return reverse('category-detail', kwargs={'pk': self.object.pk})
 
 class ProductCreateView(CreateView):
-    model = models.Tag
+    model = models.Product
     form_class = forms.ProductCreateForm
     template_name = 'product_add.html'
 
@@ -422,8 +419,16 @@ class ProductCreateView(CreateView):
             context['form'].fields['company'] = django.forms.ModelChoiceField(queryset=models.Company.objects.filter(account=account))
         return context
 
+    def form_valid(self, form):
+        obj = form.save()
+        directory = '%s%s' % (settings.PDF_ROOT, obj.id)
+        pdf_url = upload_image(form.cleaned_data['pdf_url'], directory)
+        obj.pdf_url = pdf_url
+        obj.save()
+        logger.info("Product %s has been created by %s", obj.name, self.request.user)
+        return HttpResponseRedirect(self.get_success_url())
+
     def get_success_url(self):
-        logger.info("Product %s has been created by %s", self.object.name, self.request.user)
         return reverse('product-list')
 
 class ProductListView(ListView):
@@ -449,6 +454,8 @@ class ProductDetailView(DetailView):
         account = models.Account.objects.get(username=self.request.user.username)
         is_admin = account.account_type == models.Account.ACCOUNT_TYPE_ADMIN
         context['is_admin'] = is_admin
+        if self.get_object().pdf_url != "":
+            context['pdf_url'] = '%s%s/%s' % (settings.PDF_URL, self.get_object().id, self.get_object().pdf_url)
         return context
 
 class ProductDeleteView(DeleteView):
@@ -474,9 +481,18 @@ class ProductUpdateView(UpdateView):
     form_class = forms.ProductCreateForm
     template_name = 'product_update.html'
 
+    def form_valid(self, form):
+        directory = '%s%s' % (settings.PDF_ROOT, self.get_object().id)
+        pdf = form.cleaned_data['pdf_url']
+        if pdf != self.get_object().pdf_url:
+            pdf_url = upload_image(form.cleaned_data['pdf_url'], directory)
+            form.instance.pdf_url = pdf_url
+        obj = form.save()
+        logger.info("Product %s has been updated by %s", self.get_object().name, self.request.user)
+        return HttpResponseRedirect(self.get_success_url())
+
     def get_success_url(self):
-        logger.info("Product %s has been updated by %s", self.object.name, self.request.user)
-        return reverse('product-detail', kwargs={'pk': self.object.pk})
+        return reverse('product-detail', kwargs={'pk': self.get_object().pk})
 
 class ProductImageListView(ListView):
     model = models.Gallery

@@ -125,6 +125,7 @@ class Product(models.Model):
     description = models.CharField(max_length=512)
     create_date = models.DateTimeField(auto_now_add=True)
     status = models.SmallIntegerField(choices=Account.STATUS_CHOICES, default=1)
+    pdf_url = models.FileField(upload_to='pdf', max_length=64)
 
     class Meta:
         unique_together = ('company', 'name')

@@ -39,7 +39,7 @@ class CompanyCreateForm(forms.ModelForm):
 
     class Meta:
         model = models.Company
-        fields = ['name', 'slogan', 'url', 'description', 'pdf_url']
+        fields = ['name', 'slogan', 'url', 'description']
 
 class CompanyUpdateForm(forms.ModelForm):
     description = forms.CharField(widget=forms.Textarea)
@@ -76,7 +76,7 @@ class ProductCreateForm(forms.ModelForm):
 
     class Meta:
         model = models.Product
-        fields = ['company', 'name', 'description']
+        fields = ['company', 'name', 'description', 'pdf_url']
 
 class GalleryUploadForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):

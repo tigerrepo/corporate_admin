@@ -13,12 +13,14 @@
       <li><a href="{% url 'product-list' %}">{% trans "Manage Product" %}</a></li>
     </ul>
   </li>
+  {% if is_admin %}
   <li>
     <a class="mws-i-24 i-tag" href="#">{% trans "Category Management" %}</a>
     <ul>
       <li><a href="{% url 'category-list' %}">{% trans "Category List" %}</a></li>
     </ul>
   </li>
+  {% endif %}
   <li>
     <a class="mws-i-24 i-new-message" href="#">{% trans "Message Box" %}</a>
     <ul>

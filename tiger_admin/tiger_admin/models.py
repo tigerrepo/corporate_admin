@@ -70,6 +70,7 @@ class Company(models.Model):
     status = models.SmallIntegerField(choices=Account.STATUS_CHOICES, default=Account.STATUS_DISABLE)
     account = models.ForeignKey(Account, on_delete=models.PROTECT)
     pdf_url = models.FileField(upload_to='pdf', max_length=64)
+    is_index = models.BooleanField(default=False)
 
     class Meta:
         db_table = "company_tab"

@@ -51,6 +51,18 @@
                         {% endif %}
                     </div>
                 </div>
+                <div class="mws-form-row">
+                    <label>Show in Homepage</label>
+
+                    <div class="mws-form-item medium" style="margin-top:10px;">
+                        {{ form.is_index }}
+                        {% if form.is_index.errors %}
+                            <label class='error'>{{form.is_index.errors.0}}</label>
+                        {% endif %}
+                    </div>
+                </div>
+ 
+
                 <div class="mws-button-row">
                 <button type="button" class="mws-button gray large"  onclick='javascript:window.history.back();'>Back</button>
                 <input type="submit" class="mws-button green large" value="Submit" />

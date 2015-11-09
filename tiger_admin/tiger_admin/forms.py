@@ -45,7 +45,7 @@ class CompanyCreateForm(forms.ModelForm):
 
     class Meta:
         model = models.Company
-        fields = ['name', 'slogan', 'url', 'description', 'pdf_url']
+        fields = ['name', 'slogan', 'url', 'description', 'pdf_url', 'is_index']
 
 class CompanyUpdateForm(forms.ModelForm):
     description = forms.CharField(widget=forms.Textarea)
@@ -60,7 +60,7 @@ class CompanyUpdateForm(forms.ModelForm):
 
     class Meta:
         model = models.Company
-        fields = ['name', 'slogan', 'url', 'description']
+        fields = ['name', 'slogan', 'url', 'description', 'is_index']
 
 
 class CategoryCreateForm(forms.ModelForm):

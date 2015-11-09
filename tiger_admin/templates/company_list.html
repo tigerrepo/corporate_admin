@@ -21,6 +21,7 @@
                     <th>Status</th>
                     <th>Create Date</th>
                     <th>Tag</th>
+                    <th>Show in Homepage</th>
                     <th>Detail</th>
                 </tr>
             </thead>
@@ -31,8 +32,9 @@
                     <td> <a href="{{ domain }}{{ c.url }}">{{c.url}}</a></td>
                     <td>{{ c.account }}</td>
                     <td>{{ c.status }}</td>
-                    <td>{{ c.create_time }}
-                    <td>{{ c.tag }}
+                    <td>{{ c.create_time }}</td>
+                    <td>{{ c.tag }}</td>
+                    <td>{{ c.is_index }}</td>
                     <td><a href='{% url "company-detail" c.pk %}'><img src="{% static 'css/icons/16/view.png' %}" alt="Detail" width="24" height="24" border="0"></a></td>
                 </tr>
                 {% endfor %}

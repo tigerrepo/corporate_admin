@@ -7,13 +7,11 @@
         <span class="mws-i-24 i-table-1">Company List</span>
     </div>
     <div class="mws-panel-body">
-        {% if not is_admin %}
         <div class="mws-panel-toolbar top clearfix">
             <ul>
               <li><a href='{% url "company-add" %}' class="mws-ic-16 ic-add">Create Website</a></li>
             </ul>
         </div>
-        {% endif %}
         <table class="mws-datatable-fn mws-table" id="datatable">
             <thead>
                 <tr>

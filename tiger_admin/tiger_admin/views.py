@@ -252,6 +252,11 @@ class CompanyCreateView(CreateView):
 
                 self.object = form.save()
 
+                directory = '%s%s' % (settings.PDF_ROOT, self.object.id)
+                pdf_url = upload_image(form.cleaned_data['pdf_url'], directory)
+                self.object.pdf_url = pdf_url
+                self.object.save()
+
                 video_url = form.cleaned_data['video_url']
                 name = video_url.split("=")[-1]
                 models.Video.objects.create(
@@ -289,6 +294,8 @@ class CompanyDetailView(DetailView):
             company_tag_dict[company_tag.company_id].append(company_tag.tag.name)
 
         context['tag'] = ','.join(company_tag_dict.get(self.object.pk, []))
+        if self.get_object().pdf_url != "":
+            context['pdf_url'] = '%s%s/%s' % (settings.PDF_URL, self.get_object().id, self.get_object().pdf_url)
 
         context['is_admin'] = is_admin
         return context
@@ -421,10 +428,6 @@ class ProductCreateView(CreateView):
 
     def form_valid(self, form):
         obj = form.save()
-        directory = '%s%s' % (settings.PDF_ROOT, obj.id)
-        pdf_url = upload_image(form.cleaned_data['pdf_url'], directory)
-        obj.pdf_url = pdf_url
-        obj.save()
         logger.info("Product %s has been created by %s", obj.name, self.request.user)
         return HttpResponseRedirect(self.get_success_url())
 
@@ -454,8 +457,6 @@ class ProductDetailView(DetailView):
         account = models.Account.objects.get(username=self.request.user.username)
         is_admin = account.account_type == models.Account.ACCOUNT_TYPE_ADMIN
         context['is_admin'] = is_admin
-        if self.get_object().pdf_url != "":
-            context['pdf_url'] = '%s%s/%s' % (settings.PDF_URL, self.get_object().id, self.get_object().pdf_url)
         return context
 
 class ProductDeleteView(DeleteView):
@@ -481,17 +482,8 @@ class ProductUpdateView(UpdateView):
     form_class = forms.ProductCreateForm
     template_name = 'product_update.html'
 
-    def form_valid(self, form):
-        directory = '%s%s' % (settings.PDF_ROOT, self.get_object().id)
-        pdf = form.cleaned_data['pdf_url']
-        if pdf != self.get_object().pdf_url:
-            pdf_url = upload_image(form.cleaned_data['pdf_url'], directory)
-            form.instance.pdf_url = pdf_url
-        obj = form.save()
-        logger.info("Product %s has been updated by %s", self.get_object().name, self.request.user)
-        return HttpResponseRedirect(self.get_success_url())
-
     def get_success_url(self):
+        logger.info("Product %s has been updated by %s", self.get_object().name, self.request.user)
         return reverse('product-detail', kwargs={'pk': self.get_object().pk})
 
 class ProductImageListView(ListView):

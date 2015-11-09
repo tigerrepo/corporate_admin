@@ -9,9 +9,7 @@
         <div class="mws-panel-toolbar top clearfix">
         	<ul>
         	    <li><a href="#" class="mws-ic-16 ic-arrow-left" onclick="javascript:window.history.back(); return false;">Back</a></li>
-                {% if not is_admin %}
-            	    <li><a href='{% url "company-update" object.pk %}' class="mws-ic-16 ic-pencil">Edit Info</a></li>
-                {% endif %}
+            	  <li><a href='{% url "company-update" object.pk %}' class="mws-ic-16 ic-pencil">Edit Info</a></li>
                 {% if object.status %}
                     <li><a href='{% url "company-update-status" object.pk %}' class="mws-ic-16 ic-pencil">Deactivate</a></li>
                 {% else %}
@@ -36,6 +34,10 @@
                 <tr class="gradeX">
                     <td>URL</td>
                     <td><a href="{{ domain }}{{ object.url }}">{{object.url}}</a></td>
+                </tr>
+                <tr class="gradeX">
+                    <td>PDF</td>
+                    <td><a href={{pdf_url}}>{{pdf_url}}</a></td>
                 </tr>
                 <tr class="gradeX">
                     <td>Description</td>

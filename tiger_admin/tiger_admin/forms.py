@@ -35,7 +35,8 @@ class CompanyCreateForm(forms.ModelForm):
             field.field.widget.attrs['class']='mws-textinput'
         self.fields['name'].widget.attrs['placeholder'] = 'Please input the company name'
         self.fields['slogan'].widget.attrs['placeholder'] = 'Please input the company slogan'
-        self.fields['url'].widget.attrs['placeholder'] = 'Enter a name in the end of the url http://www.riceglobal.com.sg/corporate/'
+        self.fields['url'].widget.attrs['placeholder'] = 'URL will be http://www.riceglobal.com/corporate/ntuc if you enter ntuc here'
+        self.fields['pdf_url'].widget.attrs['placeholder'] = 'Please upload introductoin pdf file'
         self.fields['video_url'].widget.attrs['placeholder'] = 'Please input the youtube video url of the company'
         self.fields['description'].widget.attrs['placeholder'] = 'Please input the company description'
 
@@ -44,7 +45,7 @@ class CompanyCreateForm(forms.ModelForm):
 
     class Meta:
         model = models.Company
-        fields = ['name', 'slogan', 'url', 'description']
+        fields = ['name', 'slogan', 'url', 'description', 'pdf_url']
 
 class CompanyUpdateForm(forms.ModelForm):
     description = forms.CharField(widget=forms.Textarea)
@@ -81,7 +82,7 @@ class ProductCreateForm(forms.ModelForm):
 
     class Meta:
         model = models.Product
-        fields = ['company', 'name', 'description', 'pdf_url']
+        fields = ['company', 'name', 'description']
 
 class GalleryUploadForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):

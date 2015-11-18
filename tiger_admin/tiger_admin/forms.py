@@ -33,6 +33,11 @@ class CompanyCreateForm(forms.ModelForm):
         super(CompanyCreateForm, self).__init__(*args, **kwargs)
         for field in self:
             field.field.widget.attrs['class']='mws-textinput'
+        self.fields['name'].widget.attrs['placeholder'] = 'Please input the company name'
+        self.fields['slogan'].widget.attrs['placeholder'] = 'Please input the company slogan'
+        self.fields['url'].widget.attrs['placeholder'] = 'Enter a name in the end of the url http://www.riceglobal.com.sg/corporate/'
+        self.fields['video_url'].widget.attrs['placeholder'] = 'Please input the youtube video url of the company'
+        self.fields['description'].widget.attrs['placeholder'] = 'Please input the company description'
 
     def clean_url(self):
         return self.cleaned_data['url'].lower()

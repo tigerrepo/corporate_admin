@@ -231,6 +231,7 @@ class CompanyListView(ListView):
             company_dict['status'] = company.get_status_display
             company_dict['pk'] = company.id
             company_dict['create_time'] = company.create_time
+            company_dict['is_index'] = company.is_index
             company_dict['tag'] = ','.join(company_tag_dict.get(company.id, []))
             company_list_with_tag.append(company_dict)
 

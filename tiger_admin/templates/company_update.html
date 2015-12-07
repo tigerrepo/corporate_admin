@@ -51,6 +51,7 @@
                         {% endif %}
                     </div>
                 </div>
+                {% if is_admin %}
                 <div class="mws-form-row">
                     <label>Show in Homepage</label>
 
@@ -61,7 +62,7 @@
                         {% endif %}
                     </div>
                 </div>
- 
+                {% endif %} 
 
                 <div class="mws-button-row">
                 <button type="button" class="mws-button gray large"  onclick='javascript:window.history.back();'>Back</button>

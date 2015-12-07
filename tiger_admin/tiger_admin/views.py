@@ -245,6 +245,12 @@ class CompanyCreateView(CreateView):
     form_class = forms.CompanyCreateForm
     template_name = 'company_add.html'
 
+    def get_context_data(self, **kwargs):
+        context = super(CompanyCreateView, self).get_context_data(**kwargs)
+        account = models.Account.objects.get(username__exact=self.request.user.username)
+        context['is_admin'] = account.account_type == models.Account.ACCOUNT_TYPE_ADMIN
+        return context
+
     def form_valid(self, form):
         try:
             with transaction.atomic(using='tiger_admin'):
@@ -253,10 +259,11 @@ class CompanyCreateView(CreateView):
 
                 self.object = form.save()
 
-                directory = '%s%s' % (settings.PDF_ROOT, self.object.id)
-                pdf_url = upload_image(form.cleaned_data['pdf_url'], directory)
-                self.object.pdf_url = pdf_url
-                self.object.save()
+                if form.cleaned_data['pdf_url'] is not None:
+                    directory = '%s%s' % (settings.PDF_ROOT, self.object.id)
+                    pdf_url = upload_image(form.cleaned_data['pdf_url'], directory)
+                    self.object.pdf_url = pdf_url
+                    self.object.save()
 
                 video_url = form.cleaned_data['video_url']
                 name = video_url.split("=")[-1]
@@ -305,6 +312,11 @@ class CompanyUpdateView(UpdateView):
     model = models.Company
     form_class = forms.CompanyUpdateForm
     template_name = 'company_update.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(CompanyUpdateView, self).get_context_data(**kwargs)
+        context['is_admin'] = self.kwargs['is_admin']
+        return context
 
     def get_success_url(self):
         logger.info("Website %s has been updated by %s", self.object.name, self.request.user)

@@ -39,6 +39,7 @@ class CompanyCreateForm(forms.ModelForm):
         self.fields['pdf_url'].widget.attrs['placeholder'] = 'Please upload introductoin pdf file'
         self.fields['video_url'].widget.attrs['placeholder'] = 'Please input the youtube video url of the company'
         self.fields['description'].widget.attrs['placeholder'] = 'Please input the company description'
+        self.fields['pdf_url'].required = False
 
     def clean_url(self):
         return self.cleaned_data['url'].lower()

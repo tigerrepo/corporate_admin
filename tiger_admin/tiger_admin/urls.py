@@ -90,7 +90,8 @@ urlpatterns = patterns('',
     # url(r'^$', 'tiger_admin.views.home', name='home'),
     # url(r'^blog/', include('blog.urls')),
 
-    url(r'^$', 'tiger_admin.views.home', name='home'),
+    url(r'^$', login_required(views.CompanyListView.as_view()),
+        name='company-list'),
     url(r'^login/$', auth_views.login, {'template_name':'login.html'}, name='login'),
     url(r'^logout/$', auth_views.logout, {'template_name':'login.html'},name='logout'),
 

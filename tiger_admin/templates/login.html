@@ -19,14 +19,22 @@
             </div>
           </div>
 
-          <div class="mws-form-row" style="padding-top:20px; padding-bottom:0">
+          <div class="mws-form-row" style="ppadding-top:20px; adding-bottom:0">
             <label>Password</label>
             <div class="mws-form-item medium">
               <input class="mws-textinput" id="id_password" name="password" type="password">
             </div>
           </div>
+          {% if form.errors %}
+          <div class="mws-form-row" style="padding-bottom:0;    margin-top: -20px; color:red;">
+            <label></label>
+            <div class="mws-form-item medium">
+              <span>Your username and password didn't match. Please try again.</span>
+            </div>
+          </div>
+          {%endif%}
           <input type="hidden" name="next" value="{{ next }}" />
-          <div class="mws-button-row" style="padding:8px; background:none;border:none;">
+          <div class="mws-button-row" style="    margin-right: 150px;padding:8px; background:none;border:none;">
             <input type="submit" class="mws-button green large" value="Login">
           </div>
         </div>

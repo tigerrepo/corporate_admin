@@ -300,6 +300,7 @@ class CompanyCreateView(CreateView):
                 models.CompanyTag.objects.get_or_create(company=self.object, tag=tag)
         except Exception as e:
             logger.error("create Website fail, roll back, website %s, operate by %s", form.cleaned_data['name'], self.request.user)
+            print e
             # add error in page
             return super(CompanyCreateView, self).form_invalid(form)
 
@@ -348,9 +349,14 @@ class CompanyUpdateView(UpdateView):
         except models.Video.DoesNotExist:
             youtube_url = ''
 
+        try:
+            tag = models.CompanyTag.objects.get(company=self.object)
+            tag_val = tag.tag_id
+        except Exception as e:
+            tag_val = 0
         initials = {}
-        initials['video_url'] = youtube_url
-        initials['tag'] = 1
+        initials['video_url'] = video.video_url
+        initials['tag'] = tag_val
         return initials
 
     def get_context_data(self, **kwargs):
@@ -377,13 +383,25 @@ class CompanyUpdateView(UpdateView):
                         self.object.pdf_url = pdf_url
                         self.object.save()
 
-                video_url = form.cleaned_data['video_url']
-                name = video_url.split("=")[-1]
-                models.Video.objects.filter(company=self.object).update(
-                    name=name,
-                    description='',
-                    video_url=video_url,
-                    host_url='%s/%s.mp4' % (self.object.id, self.object.id))
+                try:
+                    video = models.Video.objects.get(company=self.object)
+                    if form.cleaned_data['video_url'] !=  video.video_url:
+                        video_url = form.cleaned_data['video_url']
+                        name = video_url.split("=")[-1]
+                        models.Video.objects.filter(company=self.object).update(
+                                name=name,
+                                description='',
+                                video_url=video_url,
+                                host_url='%s/%s.mp4' % (self.object.id, self.object.id))
+                except models.Video.DoesNotExist:
+                        video_url = form.cleaned_data['video_url']
+                        name = video_url.split("=")[-1]
+                        models.Video.objects.filter(company=self.object).update(
+                                name=name,
+                                description='',
+                                video_url=video_url,
+                                host_url='%s/%s.mp4' % (self.object.id, self.object.id))
+
 
                 tag = form.cleaned_data['tag']
                 models.CompanyTag.objects.filter(company=self.object).update(tag=tag)
@@ -438,6 +456,7 @@ class MessageListView(ListView):
         context = super(MessageListView, self).get_context_data(**kwargs)
         account = models.Account.objects.get(username=self.request.user.username)
         is_admin = account.account_type == models.Account.ACCOUNT_TYPE_ADMIN
+        context['is_admin'] = is_admin
         if is_admin:
             context['object_list'] = models.Contact.objects.all()
         else:
@@ -530,8 +549,10 @@ class ProductListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(ProductListView, self).get_context_data(**kwargs)
+
         account = models.Account.objects.get(username__exact=self.request.user.username)
         is_admin = account.account_type == models.Account.ACCOUNT_TYPE_ADMIN
+        context['is_admin'] = is_admin
         if not is_admin:
             companies = list(c.id for c in models.Company.objects.filter(account=account))
             context['object_list'] = models.Product.objects.filter(company_id__in=companies)
@@ -654,9 +675,12 @@ class GalleryUpdateView(UpdateView):
             pk = self.kwargs.get('ppk', 0)
             if form.cleaned_data['is_cover']:
                 models.Gallery.objects.filter(product_id=pk).update(is_cover=False)
-            directory = '%s%s' % (settings.MEDIA_ROOT, pk)
-            image_url = upload_image(form.cleaned_data['image_url'], directory)
-            form.instance.image_url = image_url
+
+            if form.cleaned_data['image_url'] is not None:
+                if form.cleaned_data['image_url'] != self.get_object().image_url:
+                    directory = '%s%s' % (settings.MEDIA_ROOT, pk)
+                    image_url = upload_image(form.cleaned_data['image_url'], directory)
+                    form.instance.image_url = image_url
             form.save()
         except IntegrityError:
             form.on_duplicate_error()

@@ -106,8 +106,6 @@ class CompanyUpdateForm(forms.ModelForm):
         url = str(self.cleaned_data['video_url'])
         if not url.startswith("http://") and not url.startswith("https://"):
             raise forms.ValidationError('Video Url must be start with http:// or https://')
-        if '=' not in url:
-            raise forms.ValidationError('Video Url must be youtube format and contain = ')
         return url
 
     class Meta:

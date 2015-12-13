@@ -25,7 +25,7 @@ class AccountPasswordResetForm(forms.ModelForm):
 
 
 class CompanyCreateForm(forms.ModelForm):
-    description = forms.CharField(widget=forms.Textarea)
+    description = forms.CharField(widget=forms.Textarea, required=False)
     tag = forms.ModelChoiceField(queryset=models.Tag.objects.all())
     video_url = forms.CharField(max_length=128)
 
@@ -35,6 +35,7 @@ class CompanyCreateForm(forms.ModelForm):
             field.field.widget.attrs['class']='mws-textinput'
         self.fields['name'].widget.attrs['placeholder'] = 'Please input the company name'
         self.fields['slogan'].widget.attrs['placeholder'] = 'Please input the company slogan'
+        self.fields['slogan'].required = False
         self.fields['url'].widget.attrs['placeholder'] = 'URL will be http://www.riceglobal.com/corporate/ntuc if you enter ntuc here'
         self.fields['pdf_url'].widget.attrs['placeholder'] = 'Please upload introductoin pdf file'
         self.fields['video_url'].widget.attrs['placeholder'] = 'Please input the youtube video url of the company'
@@ -43,6 +44,7 @@ class CompanyCreateForm(forms.ModelForm):
         self.fields['tel'].widget.attrs['placeholder'] = 'Please input the company telephone'
         self.fields['email'].widget.attrs['placeholder'] = 'Please input the company email'
         self.fields['fax'].widget.attrs['placeholder'] = 'Please input the company fax'
+        self.fields['fax'].required = False
         self.fields['pdf_url'].required = False
 
     def clean_url(self):
@@ -59,12 +61,6 @@ class CompanyCreateForm(forms.ModelForm):
         if not tel.isdecimal():
             raise forms.ValidationError('Telephone number must be all digits')
         return tel
-
-    def clean_fax(self):
-        fax = self.cleaned_data['fax']
-        if not fax.isdecimal():
-            raise forms.ValidationError('Fax number must be all digits')
-        return fax
 
     def clean_video_url(self):
         url = str(self.cleaned_data['video_url'])
@@ -79,7 +75,7 @@ class CompanyCreateForm(forms.ModelForm):
         fields = ['name', 'slogan', 'url', 'description', 'pdf_url', 'is_index', 'address', 'tel', 'email', 'fax']
 
 class CompanyUpdateForm(forms.ModelForm):
-    description = forms.CharField(widget=forms.Textarea)
+    description = forms.CharField(widget=forms.Textarea, required=False)
     tag = forms.ModelChoiceField(queryset=models.Tag.objects.all())
     video_url = forms.CharField(max_length=128)
 
@@ -88,6 +84,8 @@ class CompanyUpdateForm(forms.ModelForm):
         for field in self:
             field.field.widget.attrs['class']='mws-textinput'
         self.fields['pdf_url'].required = False
+        self.fields['slogan'].required = False
+        self.fields['fax'].required = False
 
     def clean_url(self):
         return self.cleaned_data['url'].lower()
@@ -103,12 +101,6 @@ class CompanyUpdateForm(forms.ModelForm):
         if not tel.isdecimal():
             raise forms.ValidationError('Telephone number must be all digits')
         return tel
-
-    def clean_fax(self):
-        fax = self.cleaned_data['fax']
-        if not fax.isdecimal():
-            raise forms.ValidationError('Fax number must be all digits')
-        return fax
 
     def clean_video_url(self):
         url = str(self.cleaned_data['video_url'])
@@ -134,7 +126,7 @@ class CategoryCreateForm(forms.ModelForm):
         fields = ['name', 'status']
 
 class ProductCreateForm(forms.ModelForm):
-    description = forms.CharField(widget=forms.Textarea)
+    description = forms.CharField(widget=forms.Textarea, required=False)
     def __init__(self, *args, **kwargs):
         super(ProductCreateForm, self).__init__(*args, **kwargs)
         for field in self:

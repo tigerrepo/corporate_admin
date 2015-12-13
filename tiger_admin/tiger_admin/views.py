@@ -271,6 +271,8 @@ class CompanyCreateView(CreateView):
         context['is_admin'] = account.account_type == models.Account.ACCOUNT_TYPE_ADMIN
         return context
 
+    def form_invalid(self, form):
+        print form.errors
     def form_valid(self, form):
         try:
             with transaction.atomic(using='tiger_admin'):

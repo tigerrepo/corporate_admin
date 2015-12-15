@@ -1,7 +1,9 @@
+import collections
 import hashlib
 import logging
+import string
 import time
-import collections
+
 import django
 from django.contrib import messages
 from django.contrib.auth import authenticate, logout
@@ -10,6 +12,7 @@ from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
 from django.db import transaction
+from django.db.models import Q
 from django.db.utils import IntegrityError
 from django.http import HttpResponseRedirect
 from django.shortcuts import (get_object_or_404, redirect, render,
@@ -23,7 +26,6 @@ from django.views.generic.list import ListView
 
 from tiger_admin import forms, models, settings
 from utils import format_date, generate_random_password, upload_image
-from django.db.models import Q
 
 logger = logging.getLogger('main')
 
@@ -103,8 +105,17 @@ def password_reset(request, pk):
     logger.info("Account %s has been reset password %s, done by %s",
                 account.username, password, request.user)
     if settings.SENT_EMAIL:
-        send_mail('Notification', 'Your password is reset to %s, please login and change your password.' % password, settings.EMAIL_HOST_USER,
-                [account.email], fail_silently=False)
+        msg_txt = 'Your password is reset to %s, please login and change your password.' % password
+
+        MSG = string.join((
+            "From: %s" % settings.EMAIL_HOST_USER,
+            "To: %s" % account.email,
+            "Subject: Notification" ,
+            "",
+            msg_txt
+            ), "\r\n")
+
+        send_mail('Notification', MSG, settings.EMAIL_HOST_USER, [account.email], fail_silently=False)
     return redirect(reverse('admin-detail', kwargs={'pk':pk}))
 
 
@@ -140,8 +151,17 @@ def admin_add(request):
         u.save()
         logger.info("Account %s, %s, %s has been created by %s", username, password, account_type, request.user)
         if settings.SENT_EMAIL:
-            send_mail('Notification', 'Your email is generated, please use %s as password to login. For your safety, please change your password once you login the system' % password,
-                settings.EMAIL_HOST_USER, [email], fail_silently=False)
+            msg_txt = 'Your email is generated, please use %s as password to login. For your safety, please change your password once you login the system' % password
+
+            MSG = string.join((
+                "From: %s" % settings.EMAIL_HOST_USER,
+                "To: %s" % u.email,
+                "Subject: Notification" ,
+                "",
+                msg_txt
+                ), "\r\n")
+
+            send_mail('Notification', MSG, settings.EMAIL_HOST_USER, [u.email], fail_silently=False)
 
     return redirect('/admin')
 
@@ -590,4 +610,3 @@ class GalleryUpdateView(UpdateView):
         pk = self.kwargs.get('ppk', 0)
         logger.info("Image %s has been updated by %s", self.object.id, self.request.user)
         return reverse('gallery-detail', kwargs={'ppk': pk, 'pk':self.object.pk})
-

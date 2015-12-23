@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block content %}
+<div class="mws-panel grid_8">
+    <div class="mws-panel-header">
+        <span class="mws-i-24 i-table-1">Enquery List</span>
+    </div>
+    <div class="mws-panel-body">
+        <table class="mws-datatable-fn mws-table" id="datatable">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Company</th>
+                    <th>Email</th>
+                    <th>Mobile</th>
+                    <th>Region</th>
+                    <th>Create Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in object_list %}
+                <tr class="gradeX">
+                    <td>{{ c.name }}</td>
+                    <td>{{ c.company }}</td>
+                    <td>{{ c.email }}</td>
+                    <td>{{ c.mobile }}</td>
+                    <td>{{ c.get_region_display }}</td>
+                    <td>{{ c.create_time }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

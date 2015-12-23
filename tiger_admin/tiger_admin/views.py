@@ -347,21 +347,54 @@ class CompanyUpdateView(UpdateView):
             youtube_url = ''
 
         initials = {}
-        print '%s%s/%s' % (settings.PDF_URL, self.object.id, self.object.pdf_url)
-        initials['pdf_url'] = '%s%s/%s' % (settings.PDF_URL, self.object.id, self.object.pdf_url)
         initials['video_url'] = youtube_url
         initials['tag'] = 1
-
         return initials
-
 
     def get_context_data(self, **kwargs):
         context = super(CompanyUpdateView, self).get_context_data(**kwargs)
         context['is_admin'] = self.kwargs['is_admin']
+        if self.object.pdf_url == '':
+            context['pdf_url'] = ''
+        else:
+            context['pdf_url'] = '%s%s/%s' % (settings.PDF_URL, self.object.id, self.object.pdf_url)
         return context
 
+    def form_valid(self, form):
+        try:
+            with transaction.atomic(using='tiger_admin'):
+                account = models.Account.objects.get(username__exact=self.request.user.username)
+                form.instance.account = account
+
+                self.object = form.save()
+
+                if form.cleaned_data['pdf_url'] is not None:
+                    if form.cleaned_data['pdf_url'] != self.object.pdf_url:
+                        directory = '%s%s' % (settings.PDF_ROOT, self.object.id)
+                        pdf_url = upload_image(form.cleaned_data['pdf_url'], directory)
+                        self.object.pdf_url = pdf_url
+                        self.object.save()
+
+                video_url = form.cleaned_data['video_url']
+                name = video_url.split("=")[-1]
+                models.Video.objects.filter(company=self.object).update(
+                    name=name,
+                    description='',
+                    video_url=video_url,
+                    host_url='%s/%s.mp4' % (self.object.id, self.object.id))
+
+                tag = form.cleaned_data['tag']
+                models.CompanyTag.objects.filter(company=self.object).update(tag=tag)
+        except Exception as e:
+            print e
+            logger.error("update Website fail, roll back, website %s, operate by %s", form.cleaned_data['name'], self.request.user)
+            # add error in page
+            return super(CompanyUpdateView, self).form_invalid(form)
+
+        logger.info("Website %s has been updated by %s", form.cleaned_data['name'], self.request.user)
+        return HttpResponseRedirect(self.get_success_url())
+
     def get_success_url(self):
-        logger.info("Website %s has been updated by %s", self.object.name, self.request.user)
         return reverse('company-detail', kwargs={'pk': self.object.pk})
 
 class CompanyDeleteView(DeleteView):
@@ -632,3 +665,13 @@ class GalleryUpdateView(UpdateView):
         pk = self.kwargs.get('ppk', 0)
         logger.info("Image %s has been updated by %s", self.object.id, self.request.user)
         return reverse('gallery-detail', kwargs={'ppk': pk, 'pk':self.object.pk})
+
+
+class EnquiresListView(ListView):
+    model = models.Enquiry
+    template_name = 'enqury_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(EnquiresListView, self).get_context_data(**kwargs)
+        context['is_admin'] = self.kwargs['is_admin']
+        return context

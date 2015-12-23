@@ -90,6 +90,7 @@ class Video(models.Model):
     company = models.ForeignKey(Company, on_delete=models.PROTECT)
 
     class Meta:
+        unique_together = ('name', 'company')
         db_table = "video_tab"
 
 class Contact(models.Model):
@@ -152,3 +153,24 @@ class Gallery(models.Model):
     def __unicode__(self):
         return self.name
 
+
+class Enquiry(models.Model):
+    name = models.CharField(max_length=64)
+    company = models.CharField(max_length=128)
+    email = models.CharField(max_length=64)
+    mobile = models.CharField(max_length=20)
+    REGION_TYPE_SG=0
+    REGION_TYPE_CN=1
+    REGION_TYPE_CHOICES = (
+        (REGION_TYPE_SG, u'Singapore'),
+        (REGION_TYPE_CN, u'China'),
+    )
+    region = models.SmallIntegerField(choices=REGION_TYPE_CHOICES, default=0)
+    ip = models.CharField(max_length=64)
+    create_time = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'enquiry_tab'
+
+    def __unicode__(self):
+        return self.name

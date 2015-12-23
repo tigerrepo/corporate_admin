@@ -68,8 +68,10 @@ class CompanyCreateForm(forms.ModelForm):
 
     def clean_video_url(self):
         url = str(self.cleaned_data['video_url'])
-        if not url.startswith("http://") and not url.startswith("https://"):
-            raise forms.ValidationError('Video Url must be start with http:// or https://')
+        if not url.startswith("http://") and not url.startswith("https://") and not '=' in url:
+            raise forms.ValidationError('Video Url must be start with http:// or https:// and contain =')
+        if '=' not in url:
+            raise forms.ValidationError('Video Url must be youtube format and contain = ')
         return url
 
     class Meta:
@@ -85,6 +87,7 @@ class CompanyUpdateForm(forms.ModelForm):
         super(CompanyUpdateForm, self).__init__(*args, **kwargs)
         for field in self:
             field.field.widget.attrs['class']='mws-textinput'
+        self.fields['pdf_url'].required = False
 
     def clean_url(self):
         return self.cleaned_data['url'].lower()
@@ -111,11 +114,13 @@ class CompanyUpdateForm(forms.ModelForm):
         url = str(self.cleaned_data['video_url'])
         if not url.startswith("http://") and not url.startswith("https://"):
             raise forms.ValidationError('Video Url must be start with http:// or https://')
+        if '=' not in url:
+            raise forms.ValidationError('Video Url must be youtube format and contain = ')
         return url
 
     class Meta:
         model = models.Company
-        fields = ['name', 'slogan', 'url', 'description', 'is_index', 'address', 'tel', 'email', 'fax']
+        fields = ['name', 'slogan', 'url', 'description', 'pdf_url', 'is_index', 'address', 'tel', 'email', 'fax']
 
 
 class CategoryCreateForm(forms.ModelForm):

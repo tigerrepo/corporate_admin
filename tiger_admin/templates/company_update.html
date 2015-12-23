@@ -6,7 +6,7 @@
         <span class="mws-i-24 i-pencil">Update Website {{object}}</span>
     </div>
     <div class="mws-panel-body">
-        <form id="mws-validate" class="mws-form" action="" method="post">
+        <form id="mws-validate" class="mws-form" action="" method="post" enctype="multipart/form-data">
             {% csrf_token %}
             <div id="mws-validate-error" class="mws-form-message error" style="display:none;"></div>
             <div class="mws-form-inline">
@@ -54,6 +54,9 @@
                     <label>PDF Upload</label>
 
                     <div class="mws-form-item medium">
+                        {% if pdf_url != '' %}
+                        <a href="{{ pdf_url }}">{{ pdf_url }}</a>
+                        {% endif %}
                         {{ form.pdf_url }}
                         <br/> <span style="color:red;">Please Upload PDF file </span> 
                         {% if form.pdf_url.errors %}

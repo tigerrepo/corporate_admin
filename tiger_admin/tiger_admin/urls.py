@@ -192,4 +192,8 @@ urlpatterns = patterns('',
     url(r'^message/(?P<pk>\d+)/detail/$',
         check_message_permission(login_required(views.MessageDetailView.as_view())),
         name='message-detail'),
+
+    url(r'^enquries/$',
+        check_user_role(login_required(views.EnquiresListView.as_view())),
+        name='enquries-list'),
 )

@@ -62,6 +62,47 @@
                     </div>
                 </div>
                 <div class="mws-form-row">
+                    <label>Address</label>
+
+                    <div class="mws-form-item medium">
+                        {{ form.address}}
+                        {% if form.address.errors %}
+                            <label class='error'>{{form.address.errors.0}}</label>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="mws-form-row">
+                    <label>Email</label>
+
+                    <div class="mws-form-item medium">
+                        {{ form.email}}
+                        {% if form.email.errors %}
+                            <label class='error'>{{form.email.errors.0}}</label>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="mws-form-row">
+                    <label>Tel</label>
+
+                    <div class="mws-form-item medium">
+                        {{ form.tel}}
+                        {% if form.tel.errors %}
+                            <label class='error'>{{form.tel.errors.0}}</label>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="mws-form-row">
+                    <label>Fax</label>
+
+                    <div class="mws-form-item medium">
+                        {{ form.fax}}
+                        {% if form.fax.errors %}
+                            <label class='error'>{{form.fax.errors.0}}</label>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="mws-form-row">
                     <label>Description</label>
 
                     <div class="mws-form-item medium">

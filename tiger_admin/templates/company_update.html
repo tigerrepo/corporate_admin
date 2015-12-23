@@ -40,7 +40,67 @@
                         {% endif %}
                     </div>
                 </div>
+                <div class="mws-form-row">
+                    <label>Youtube URL</label>
 
+                    <div class="mws-form-item medium">
+                        {{ form.video_url }}
+                        {% if form.video_url.errors %}
+                            <label class='error'>{{form.video_url.errors.0}}</label>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="mws-form-row">
+                    <label>PDF Upload</label>
+
+                    <div class="mws-form-item medium">
+                        {{ form.pdf_url }}
+                        <br/> <span style="color:red;">Please Upload PDF file </span> 
+                        {% if form.pdf_url.errors %}
+                            <label class='error'>{{form.pdf_url.errors.0}}</label>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="mws-form-row">
+                    <label>Address</label>
+
+                    <div class="mws-form-item medium">
+                        {{ form.address}}
+                        {% if form.address.errors %}
+                            <label class='error'>{{form.address.errors.0}}</label>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="mws-form-row">
+                    <label>Email</label>
+
+                    <div class="mws-form-item medium">
+                        {{ form.email}}
+                        {% if form.email.errors %}
+                            <label class='error'>{{form.email.errors.0}}</label>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="mws-form-row">
+                    <label>Tel</label>
+
+                    <div class="mws-form-item medium">
+                        {{ form.tel}}
+                        {% if form.tel.errors %}
+                            <label class='error'>{{form.tel.errors.0}}</label>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="mws-form-row">
+                    <label>Fax</label>
+
+                    <div class="mws-form-item medium">
+                        {{ form.fax}}
+                        {% if form.fax.errors %}
+                            <label class='error'>{{form.fax.errors.0}}</label>
+                        {% endif %}
+                    </div>
+                </div>
                 <div class="mws-form-row">
                     <label>Description</label>
 
@@ -48,6 +108,16 @@
                         {{ form.description}}
                         {% if form.description.errors %}
                             <label class='error'>{{form.description.errors.0}}</label>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="mws-form-row">
+                    <label>Category</label>
+
+                    <div class="mws-form-item medium" style="margin-top:8px;">
+                        {{ form.tag }}
+                        {% if form.tag.errors %}
+                            <label class='error'>{{form.tag.errors.0}}</label>
                         {% endif %}
                     </div>
                 </div>

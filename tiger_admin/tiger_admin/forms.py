@@ -39,17 +39,47 @@ class CompanyCreateForm(forms.ModelForm):
         self.fields['pdf_url'].widget.attrs['placeholder'] = 'Please upload introductoin pdf file'
         self.fields['video_url'].widget.attrs['placeholder'] = 'Please input the youtube video url of the company'
         self.fields['description'].widget.attrs['placeholder'] = 'Please input the company description'
+        self.fields['address'].widget.attrs['placeholder'] = 'Please input the company address'
+        self.fields['tel'].widget.attrs['placeholder'] = 'Please input the company telephone'
+        self.fields['email'].widget.attrs['placeholder'] = 'Please input the company email'
+        self.fields['fax'].widget.attrs['placeholder'] = 'Please input the company fax'
         self.fields['pdf_url'].required = False
 
     def clean_url(self):
         return self.cleaned_data['url'].lower()
 
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        if not "@" in email or not '.' in email:
+            raise forms.ValidationError('Email is not valid')
+        return email
+
+    def clean_tel(self):
+        tel = self.cleaned_data['tel']
+        if not tel.isdecimal():
+            raise forms.ValidationError('Telephone number must be all digits')
+        return tel
+
+    def clean_fax(self):
+        fax = self.cleaned_data['fax']
+        if not fax.isdecimal():
+            raise forms.ValidationError('Fax number must be all digits')
+        return fax
+
+    def clean_video_url(self):
+        url = str(self.cleaned_data['video_url'])
+        if not url.startswith("http://") and not url.startswith("https://"):
+            raise forms.ValidationError('Video Url must be start with http:// or https://')
+        return url
+
     class Meta:
         model = models.Company
-        fields = ['name', 'slogan', 'url', 'description', 'pdf_url', 'is_index']
+        fields = ['name', 'slogan', 'url', 'description', 'pdf_url', 'is_index', 'address', 'tel', 'email', 'fax']
 
 class CompanyUpdateForm(forms.ModelForm):
     description = forms.CharField(widget=forms.Textarea)
+    tag = forms.ModelChoiceField(queryset=models.Tag.objects.all())
+    video_url = forms.CharField(max_length=128)
 
     def __init__(self, *args, **kwargs):
         super(CompanyUpdateForm, self).__init__(*args, **kwargs)
@@ -59,9 +89,33 @@ class CompanyUpdateForm(forms.ModelForm):
     def clean_url(self):
         return self.cleaned_data['url'].lower()
 
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        if not "@" in email or not '.' in email:
+            raise forms.ValidationError('Email is not valid')
+        return email
+
+    def clean_tel(self):
+        tel = self.cleaned_data['tel']
+        if not tel.isdecimal():
+            raise forms.ValidationError('Telephone number must be all digits')
+        return tel
+
+    def clean_fax(self):
+        fax = self.cleaned_data['fax']
+        if not fax.isdecimal():
+            raise forms.ValidationError('Fax number must be all digits')
+        return fax
+
+    def clean_video_url(self):
+        url = str(self.cleaned_data['video_url'])
+        if not url.startswith("http://") and not url.startswith("https://"):
+            raise forms.ValidationError('Video Url must be start with http:// or https://')
+        return url
+
     class Meta:
         model = models.Company
-        fields = ['name', 'slogan', 'url', 'description', 'is_index']
+        fields = ['name', 'slogan', 'url', 'description', 'is_index', 'address', 'tel', 'email', 'fax']
 
 
 class CategoryCreateForm(forms.ModelForm):

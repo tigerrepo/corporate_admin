@@ -325,6 +325,12 @@ class CompanyDetailView(DetailView):
         if self.get_object().pdf_url != "":
             context['pdf_url'] = '%s%s/%s' % (settings.PDF_URL, self.get_object().id, self.get_object().pdf_url)
 
+        try:
+            video = models.Video.objects.get(company=self.get_object())
+            context['youtube_url'] = "%s%s" % (settings.YOUTUBE_URL_PREFIX, video.name)
+        except models.Video.DoesNotExist:
+            context['youtube_url'] = ''
+
         context['is_admin'] = is_admin
         return context
 
@@ -332,6 +338,22 @@ class CompanyUpdateView(UpdateView):
     model = models.Company
     form_class = forms.CompanyUpdateForm
     template_name = 'company_update.html'
+
+    def get_initial(self):
+        try:
+            video = models.Video.objects.get(company=self.object)
+            youtube_url = "%s%s" % (settings.YOUTUBE_URL_PREFIX, video.name)
+        except models.Video.DoesNotExist:
+            youtube_url = ''
+
+        initials = {}
+        print '%s%s/%s' % (settings.PDF_URL, self.object.id, self.object.pdf_url)
+        initials['pdf_url'] = '%s%s/%s' % (settings.PDF_URL, self.object.id, self.object.pdf_url)
+        initials['video_url'] = youtube_url
+        initials['tag'] = 1
+
+        return initials
+
 
     def get_context_data(self, **kwargs):
         context = super(CompanyUpdateView, self).get_context_data(**kwargs)

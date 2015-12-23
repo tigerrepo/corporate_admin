@@ -71,7 +71,11 @@ class Company(models.Model):
     account = models.ForeignKey(Account, on_delete=models.PROTECT)
     pdf_url = models.FileField(upload_to='pdf', max_length=64)
     is_index = models.BooleanField(default=False)
-
+    address = models.CharField(max_length=128)
+    email = models.CharField(max_length=64)
+    tel = models.CharField(max_length=20)
+    fax = models.CharField(max_length=20)
+    
     class Meta:
         db_table = "company_tab"
 

@@ -161,3 +161,5 @@ DEFAULT_TO_EMAIL = 'miracleluchen@gmail.com'
 
 IMAGE_URL_PREFIX = 'http://cdn.riceglobal.com/gallery/'
 DOMAIN_NAME = 'http://admin.riceglobal.com/'
+
+YOUTUBE_URL_PREFIX = 'http://www.youtube.com/embed/'

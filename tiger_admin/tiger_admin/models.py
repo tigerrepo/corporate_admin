@@ -168,6 +168,7 @@ class Enquiry(models.Model):
     region = models.SmallIntegerField(choices=REGION_TYPE_CHOICES, default=0)
     ip = models.CharField(max_length=64)
     create_time = models.DateTimeField(auto_now_add=True)
+    remarks = models.CharField(max_length=256)
 
     class Meta:
         db_table = 'enquiry_tab'

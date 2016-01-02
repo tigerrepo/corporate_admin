@@ -15,6 +15,7 @@
                     <th>Email</th>
                     <th>Mobile</th>
                     <th>Region</th>
+                    <th>Remarks</th>
                     <th>Create Date</th>
                 </tr>
             </thead>
@@ -26,6 +27,7 @@
                     <td>{{ c.email }}</td>
                     <td>{{ c.mobile }}</td>
                     <td>{{ c.get_region_display }}</td>
+                    <td>{{ c.remarks }}</td>
                     <td>{{ c.create_time }}</td>
                 </tr>
                 {% endfor %}

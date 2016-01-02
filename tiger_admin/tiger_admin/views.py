@@ -298,6 +298,7 @@ class CompanyCreateView(CreateView):
                 models.CompanyTag.objects.get_or_create(company=self.object, tag=tag)
         except Exception as e:
             logger.error("create Website fail, roll back, website %s, operate by %s", form.cleaned_data['name'], self.request.user)
+            print e
             # add error in page
             return super(CompanyCreateView, self).form_invalid(form)
 
@@ -436,6 +437,7 @@ class MessageListView(ListView):
         context = super(MessageListView, self).get_context_data(**kwargs)
         account = models.Account.objects.get(username=self.request.user.username)
         is_admin = account.account_type == models.Account.ACCOUNT_TYPE_ADMIN
+        context['is_admin'] = is_admin
         if is_admin:
             context['object_list'] = models.Contact.objects.all()
         else:
@@ -528,8 +530,10 @@ class ProductListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(ProductListView, self).get_context_data(**kwargs)
+
         account = models.Account.objects.get(username__exact=self.request.user.username)
         is_admin = account.account_type == models.Account.ACCOUNT_TYPE_ADMIN
+        context['is_admin'] = is_admin
         if not is_admin:
             companies = list(c.id for c in models.Company.objects.filter(account=account))
             context['object_list'] = models.Product.objects.filter(company_id__in=companies)

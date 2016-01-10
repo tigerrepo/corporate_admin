@@ -670,15 +670,15 @@ class GalleryUpdateView(UpdateView):
 
     def form_valid(self, form):
         try:
-            print form.cleaned_data
             pk = self.kwargs.get('ppk', 0)
             if form.cleaned_data['is_cover']:
                 models.Gallery.objects.filter(product_id=pk).update(is_cover=False)
-            directory = '%s%s' % (settings.MEDIA_ROOT, pk)
 
-            if form.cleaned_data['image_url'] != self.object.image_url:
-                image_url = upload_image(form.cleaned_data['image_url'], directory)
-                form.instance.image_url = image_url
+            if form.cleaned_data['image_url'] is not None:
+                if form.cleaned_data['image_url'] != self.get_object().image_url:
+                    directory = '%s%s' % (settings.MEDIA_ROOT, pk)
+                    image_url = upload_image(form.cleaned_data['image_url'], directory)
+                    form.instance.image_url = image_url
             form.save()
         except IntegrityError:
             form.on_duplicate_error()

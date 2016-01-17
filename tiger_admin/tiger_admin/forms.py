@@ -58,8 +58,12 @@ class CompanyCreateForm(forms.ModelForm):
 
     def clean_tel(self):
         tel = self.cleaned_data['tel']
+
         if not tel.isdecimal():
-            raise forms.ValidationError('Telephone number must be all digits')
+            if '(' in tel or ')' in tel or '+' in tel or '_' in tel or '-' in tel:
+                return tel
+            else:
+                raise forms.ValidationError('Telephone number is invalid')
         return tel
 
     def clean_video_url(self):
@@ -99,7 +103,10 @@ class CompanyUpdateForm(forms.ModelForm):
     def clean_tel(self):
         tel = self.cleaned_data['tel']
         if not tel.isdecimal():
-            raise forms.ValidationError('Telephone number must be all digits')
+            if '(' in tel or ')' in tel or '+' in tel or '_' in tel or '-' in tel:
+                return tel
+            else:
+                raise forms.ValidationError('Telephone number is invalid')
         return tel
 
     def clean_video_url(self):

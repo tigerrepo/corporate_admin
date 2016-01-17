@@ -271,8 +271,6 @@ class CompanyCreateView(CreateView):
         context['is_admin'] = account.account_type == models.Account.ACCOUNT_TYPE_ADMIN
         return context
 
-    def form_invalid(self, form):
-        print form.errors
     def form_valid(self, form):
         try:
             with transaction.atomic(using='tiger_admin'):
@@ -662,8 +660,9 @@ class GalleryDeleteView(DeleteView):
 
     def get_success_url(self):
         pk = self.kwargs.get('ppk', 0)
+        print pk
         logger.info("Image %s has been deleted by %s", self.object.name, self.request.user)
-        return reverse('product-image-list', kwargs={'ppk': pk})
+        return reverse('product-image-list', kwargs={'pk': pk})
 
 class GalleryUpdateView(UpdateView):
     model = models.Gallery

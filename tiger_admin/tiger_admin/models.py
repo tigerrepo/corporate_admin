@@ -60,7 +60,7 @@ def delete_user(sender, instance=None, **kwargs):
         user.delete()
 
 class Company(models.Model):
-    name = models.CharField(max_length=32, unique=True)
+    name = models.CharField(max_length=255, unique=True)
     slogan = models.CharField(max_length=128)
     url = models.CharField(max_length=64, unique=True)
     description = models.CharField(max_length=1024)
@@ -83,7 +83,7 @@ class Company(models.Model):
         return self.name
 
 class Video(models.Model):
-    name = models.CharField(max_length=32)
+    name = models.CharField(max_length=64)
     description = models.CharField(max_length=1024)
     video_url = models.CharField(max_length=256)
     host_url = models.CharField(max_length=128)
@@ -109,7 +109,7 @@ class Contact(models.Model):
         return self.title
 
 class Tag(models.Model):
-    name = models.CharField(max_length=32, unique=True)
+    name = models.CharField(max_length=64, unique=True)
     status = models.SmallIntegerField(choices=Account.STATUS_CHOICES, default=1)
     class Meta:
         db_table = 'tag_tab'
@@ -127,7 +127,7 @@ class CompanyTag(models.Model):
 
 class Product(models.Model):
     company = models.ForeignKey(Company, on_delete=models.PROTECT)
-    name = models.CharField(max_length=64)
+    name = models.CharField(max_length=255)
     description = models.CharField(max_length=1024)
     create_date = models.DateTimeField(auto_now_add=True)
     status = models.SmallIntegerField(choices=Account.STATUS_CHOICES, default=1)

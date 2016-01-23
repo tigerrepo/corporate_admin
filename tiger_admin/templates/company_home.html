@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block content %}
+<div class="mws-panel grid_8">
+    <div class="mws-panel-header">
+        <span class="mws-i-24 i-table-1">Order Management</span>
+    </div>
+    <div class="mws-panel-body">
+        <div class="mws-panel-toolbar top clearfix">
+            <ul>
+                {% if is_admin %}
+                    <li><a href='{% url "company-list" %}' class="mws-ic-16 ic-arrow-left">Back</a></li>
+                {% endif %}
+            </ul>
+        </div>
+        <table class="mws-datatable-fn mws-table" id="datatable">
+            <thead>
+                <tr>
+                    <th>Company Name</th>
+                    <th>Owner Account</th>
+                    <th>Display Order</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in object_list %}
+                <tr class="gradeX">
+                    <td>{{ c.company.name }}</td>
+                    <td>{{ c.company.account.username }}</td>
+                    <td>{{ c.dis_order }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -677,3 +677,7 @@ class EnquiresListView(ListView):
     model = models.Enquiry
     template_name = 'enqury_list.html'
 
+
+class CompanyHomepageView(ListView):
+    model = models.HotCompany
+    template_name = 'company_home.html'

@@ -9,7 +9,9 @@
     <div class="mws-panel-body">
         <div class="mws-panel-toolbar top clearfix">
             <ul>
-              <li><a href='{% url "company-add" %}' class="mws-ic-16 ic-add">Create Website</a></li>
+                {% if is_admin %}
+                    <li><a href='{% url "company-add" %}' class="mws-ic-16 ic-add">Create Website</a></li>
+                {% endif %}
             </ul>
         </div>
         <table class="mws-datatable-fn mws-table" id="datatable">

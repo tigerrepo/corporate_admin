@@ -175,3 +175,11 @@ class Enquiry(models.Model):
 
     def __unicode__(self):
         return self.name
+
+
+class HotCompany(models.Model):
+    company = models.ForeignKey(Company, on_delete=models.PROTECT)
+    dis_order = models.IntegerField(default=1)
+
+    class Meta:
+        db_table = 'hot_company_tab'

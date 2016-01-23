@@ -10,7 +10,8 @@
         {% if not is_admin %}
         <div class="mws-panel-toolbar top clearfix">
             <ul>
-              <li><a href='{% url "gallery-add" product %}' class="mws-ic-16 ic-add">Upload Image</a></li>
+                <li><a href='{% url "product-detail" product %}' class="mws-ic-16 ic-arrow-left">Back</a></li>
+                <li><a href='{% url "gallery-add" product %}' class="mws-ic-16 ic-add">Upload Image</a></li>
             </ul>
         </div>
         {% endif %}

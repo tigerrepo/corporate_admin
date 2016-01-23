@@ -8,7 +8,7 @@
     <div class="mws-panel-body">
         <div class="mws-panel-toolbar top clearfix">
           <ul>
-              <li><a href="#" class="mws-ic-16 ic-arrow-left" onclick="javascript:window.history.back(); return false;">Back</a></li>
+              <li><a href="{% url 'admin-list' %}" class="mws-ic-16 ic-arrow-left">Back</a></li>
               {% if is_superuser %}
                 {% if object.status %}
                 <li><a href='{% url "admin-update-status" object.pk %}' class="mws-ic-16 ic-pencil">Deactivate</a></li>

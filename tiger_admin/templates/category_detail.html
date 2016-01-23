@@ -24,7 +24,7 @@ $(document).ready(function() {
     <div class="mws-panel-body">
         <div class="mws-panel-toolbar top clearfix">
         	<ul>
-        	    <li><a href="#" class="mws-ic-16 ic-arrow-left" onclick="javascript:window.history.back(); return false;">Back</a></li>
+        	    <li><a href="{% url 'category-list' %}" class="mws-ic-16 ic-arrow-left">Back</a></li>
             	    <li><a href='{% url "category-update" object.pk %}' class="mws-ic-16 ic-pencil">Edit Info</a></li>
                 {% if is_superuser %}
                     <li><a href='{% url "category-delete" object.pk %}' class="mws-ic-16 ic-delete">Delete</a></li>

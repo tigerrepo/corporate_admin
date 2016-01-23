@@ -1,3 +1,4 @@
+from ckeditor.widgets import CKEditorWidget
 from django import forms
 from tiger_admin import models
 from django.forms.util import ErrorList
@@ -25,9 +26,10 @@ class AccountPasswordResetForm(forms.ModelForm):
 
 
 class CompanyCreateForm(forms.ModelForm):
-    description = forms.CharField(widget=forms.Textarea, required=False)
+    description = forms.CharField(widget=CKEditorWidget(), required=False)
     tag = forms.ModelChoiceField(queryset=models.Tag.objects.all())
     video_url = forms.CharField(max_length=128)
+    account = forms.ModelChoiceField(queryset=models.Account.objects.filter(status=models.Account.STATUS_ENABLE))
 
     def __init__(self, *args, **kwargs):
         super(CompanyCreateForm, self).__init__(*args, **kwargs)
@@ -76,12 +78,13 @@ class CompanyCreateForm(forms.ModelForm):
 
     class Meta:
         model = models.Company
-        fields = ['name', 'slogan', 'url', 'description', 'pdf_url', 'is_index', 'address', 'tel', 'email', 'fax']
+        fields = ['name', 'slogan', 'url', 'description', 'pdf_url', 'is_index', 'address', 'tel', 'email', 'fax', 'account']
 
 class CompanyUpdateForm(forms.ModelForm):
-    description = forms.CharField(widget=forms.Textarea, required=False)
+    description = forms.CharField(widget=CKEditorWidget(), required=False)
     tag = forms.ModelChoiceField(queryset=models.Tag.objects.all())
     video_url = forms.CharField(max_length=128)
+    account = forms.ModelChoiceField(queryset=models.Account.objects.filter(status=models.Account.STATUS_ENABLE))
 
     def __init__(self, *args, **kwargs):
         super(CompanyUpdateForm, self).__init__(*args, **kwargs)
@@ -117,7 +120,7 @@ class CompanyUpdateForm(forms.ModelForm):
 
     class Meta:
         model = models.Company
-        fields = ['name', 'slogan', 'url', 'description', 'pdf_url', 'is_index', 'address', 'tel', 'email', 'fax']
+        fields = ['name', 'slogan', 'url', 'description', 'pdf_url', 'is_index', 'address', 'tel', 'email', 'fax', 'account']
 
 
 class CategoryCreateForm(forms.ModelForm):

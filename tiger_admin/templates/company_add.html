@@ -11,6 +11,16 @@
             <div id="mws-validate-error" class="mws-form-message error" style="display:none;"></div>
             <div class="mws-form-inline">
                 <div class="mws-form-row">
+                    <label>Owner Account</label>
+
+                    <div class="mws-form-item medium" style="margin-top:8px;">
+                        {{ form.account }}
+                        {% if form.account.errors %}
+                            <label class='error'>{{form.account.errors.0}}</label>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="mws-form-row">
                     <label>Name</label>
 
                     <div class="mws-form-item medium">

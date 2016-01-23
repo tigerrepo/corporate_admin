@@ -172,8 +172,6 @@ class AccountDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super(AccountDetailView, self).get_context_data(**kwargs)
         context['login_user'] = self.kwargs['account']
-        context['is_superuser'] = self.request.user.is_superuser
-        context['is_admin'] = self.kwargs['is_admin']
         return context
 
 class AccountDeleteView(DeleteView):
@@ -274,9 +272,6 @@ class CompanyCreateView(CreateView):
     def form_valid(self, form):
         try:
             with transaction.atomic(using='tiger_admin'):
-                account = models.Account.objects.get(username__exact=self.request.user.username)
-                form.instance.account = account
-
                 self.object = form.save()
 
                 if form.cleaned_data['pdf_url'] is not None:
@@ -359,7 +354,6 @@ class CompanyUpdateView(UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super(CompanyUpdateView, self).get_context_data(**kwargs)
-        context['is_admin'] = self.kwargs['is_admin']
         if self.object.pdf_url == '':
             context['pdf_url'] = ''
         else:
@@ -369,9 +363,6 @@ class CompanyUpdateView(UpdateView):
     def form_valid(self, form):
         try:
             with transaction.atomic(using='tiger_admin'):
-                account = models.Account.objects.get(username__exact=self.request.user.username)
-                form.instance.account = account
-
                 self.object = form.save()
 
                 if form.cleaned_data['pdf_url'] is not None:
@@ -479,19 +470,11 @@ class CategoryListView(ListView):
     model = models.Tag
     template_name = 'category_list.html'
 
-    def get_context_data(self, **kwargs):
-        context = super(CategoryListView, self).get_context_data(**kwargs)
-        context['is_admin'] = self.kwargs['is_admin']
-        return context
 
 class CategoryDetailView(DetailView):
     model = models.Tag
     template_name = 'category_detail.html'
 
-    def get_context_data(self, **kwargs):
-        context = super(CategoryDetailView, self).get_context_data(**kwargs)
-        context['is_superuser'] = self.request.user.is_superuser
-        return context
 
 class CategoryDeleteView(DeleteView):
     model = models.Tag
@@ -511,6 +494,7 @@ class CategoryDeleteView(DeleteView):
     def get_success_url(self):
         return reverse('category-list')
 
+
 class CategoryUpdateView(UpdateView):
     model = models.Tag
     form_class = forms.CategoryCreateForm
@@ -519,6 +503,7 @@ class CategoryUpdateView(UpdateView):
     def get_success_url(self):
         logger.info("Category %s has been updated by %s", self.object.name, self.request.user)
         return reverse('category-detail', kwargs={'pk': self.object.pk})
+
 
 class ProductCreateView(CreateView):
     model = models.Product
@@ -550,7 +535,6 @@ class ProductListView(ListView):
 
         account = models.Account.objects.get(username__exact=self.request.user.username)
         is_admin = account.account_type == models.Account.ACCOUNT_TYPE_ADMIN
-        context['is_admin'] = is_admin
         if not is_admin:
             companies = list(c.id for c in models.Company.objects.filter(account=account))
             context['object_list'] = models.Product.objects.filter(company_id__in=companies)
@@ -564,8 +548,6 @@ class ProductDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super(ProductDetailView, self).get_context_data(**kwargs)
         account = models.Account.objects.get(username=self.request.user.username)
-        is_admin = account.account_type == models.Account.ACCOUNT_TYPE_ADMIN
-        context['is_admin'] = is_admin
         return context
 
 class ProductDeleteView(DeleteView):
@@ -660,7 +642,6 @@ class GalleryDeleteView(DeleteView):
 
     def get_success_url(self):
         pk = self.kwargs.get('ppk', 0)
-        print pk
         logger.info("Image %s has been deleted by %s", self.object.name, self.request.user)
         return reverse('product-image-list', kwargs={'pk': pk})
 
@@ -696,7 +677,3 @@ class EnquiresListView(ListView):
     model = models.Enquiry
     template_name = 'enqury_list.html'
 
-    def get_context_data(self, **kwargs):
-        context = super(EnquiresListView, self).get_context_data(**kwargs)
-        context['is_admin'] = self.kwargs['is_admin']
-        return context

@@ -8,7 +8,7 @@
     <div class="mws-panel-body">
         <div class="mws-panel-toolbar top clearfix">
         	<ul>
-        	    <li><a href="#" class="mws-ic-16 ic-arrow-left" onclick="javascript:window.history.back(); return false;">Back</a></li>
+        	    <li><a href="{% url 'company-list' %}" class="mws-ic-16 ic-arrow-left">Back</a></li>
             	  <li><a href='{% url "company-update" object.pk %}' class="mws-ic-16 ic-pencil">Edit Info</a></li>
                 {% if object.status %}
                     <li><a href='{% url "company-update-status" object.pk %}' class="mws-ic-16 ic-pencil">Deactivate</a></li>
@@ -22,7 +22,10 @@
         </div>
         <table class="mws-table" id="datatable">
             <tbody>
-                
+                <tr class="gradeX">
+                    <td>Owner Account</td>
+                    <td>{{object.account.username}}</td>
+                </tr>
                 <tr class="gradeX">
                     <td>Name</td>
                     <td>{{object.name}}</td>

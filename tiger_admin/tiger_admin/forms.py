@@ -1,6 +1,7 @@
 from django import forms
 from tiger_admin import models
 from django.forms.util import ErrorList
+from ckeditor.fields import RichTextField
 
 class AccountPasswordResetForm(forms.ModelForm):
     old_password = forms.CharField(widget=forms.PasswordInput)
@@ -25,7 +26,7 @@ class AccountPasswordResetForm(forms.ModelForm):
 
 
 class CompanyCreateForm(forms.ModelForm):
-    description = forms.CharField(widget=forms.Textarea, required=False)
+    # description = forms.CharField(widget=forms.Textarea, required=False)
     tag = forms.ModelChoiceField(queryset=models.Tag.objects.all())
     video_url = forms.CharField(max_length=128)
     account = forms.ModelChoiceField(queryset=models.Account.objects.filter(status=models.Account.STATUS_ENABLE))
@@ -47,6 +48,7 @@ class CompanyCreateForm(forms.ModelForm):
         self.fields['fax'].widget.attrs['placeholder'] = 'Please input the company fax'
         self.fields['fax'].required = False
         self.fields['pdf_url'].required = False
+        self.fields['description'].required = False
 
     def clean_url(self):
         return self.cleaned_data['url'].lower()
@@ -80,7 +82,7 @@ class CompanyCreateForm(forms.ModelForm):
         fields = ['name', 'slogan', 'url', 'description', 'pdf_url', 'is_index', 'address', 'tel', 'email', 'fax', 'account', 'dis_order']
 
 class CompanyUpdateForm(forms.ModelForm):
-    description = forms.CharField(widget=forms.Textarea, required=False)
+    # description = forms.CharField(widget=forms.Textarea, required=False)
     tag = forms.ModelChoiceField(queryset=models.Tag.objects.all())
     video_url = forms.CharField(max_length=128)
     account = forms.ModelChoiceField(queryset=models.Account.objects.filter(status=models.Account.STATUS_ENABLE))
@@ -92,6 +94,7 @@ class CompanyUpdateForm(forms.ModelForm):
         self.fields['pdf_url'].required = False
         self.fields['slogan'].required = False
         self.fields['fax'].required = False
+        self.fields['description'].required = False
 
     def clean_url(self):
         return self.cleaned_data['url'].lower()
@@ -133,7 +136,7 @@ class CategoryCreateForm(forms.ModelForm):
         fields = ['name', 'status']
 
 class ProductCreateForm(forms.ModelForm):
-    description = forms.CharField(widget=forms.Textarea, required=False)
+    # description = forms.CharField(widget=forms.Textarea, required=False)
     def __init__(self, *args, **kwargs):
         super(ProductCreateForm, self).__init__(*args, **kwargs)
         for field in self:

@@ -1,3 +1,4 @@
+from ckeditor.fields import RichTextField
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import pre_save, post_delete
@@ -63,7 +64,8 @@ class Company(models.Model):
     name = models.CharField(max_length=255, unique=True)
     slogan = models.CharField(max_length=128)
     url = models.CharField(max_length=64, unique=True)
-    description = models.CharField(max_length=1024)
+    # description = models.CharField(max_length=1024)
+    description = RichTextField()
     create_time = models.DateTimeField(auto_now_add=True)
     valid_from = models.DateTimeField()
     valid_to = models.DateTimeField()
@@ -129,7 +131,7 @@ class CompanyTag(models.Model):
 class Product(models.Model):
     company = models.ForeignKey(Company, on_delete=models.PROTECT)
     name = models.CharField(max_length=255)
-    description = models.CharField(max_length=1024)
+    description = RichTextField()
     create_date = models.DateTimeField(auto_now_add=True)
     status = models.SmallIntegerField(choices=Account.STATUS_CHOICES, default=1)
     #pdf_url = models.FileField(upload_to='pdf', max_length=64)

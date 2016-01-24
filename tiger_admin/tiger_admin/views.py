@@ -251,6 +251,7 @@ class CompanyListView(ListView):
             company_dict['create_time'] = company.create_time
             company_dict['is_index'] = company.is_index
             company_dict['tag'] = ','.join(company_tag_dict.get(company.id, []))
+            company_dict['dis_order'] = company.dis_order
             company_list_with_tag.append(company_dict)
 
         context['is_admin'] = is_admin
@@ -676,8 +677,3 @@ class GalleryUpdateView(UpdateView):
 class EnquiresListView(ListView):
     model = models.Enquiry
     template_name = 'enqury_list.html'
-
-
-class CompanyHomepageView(ListView):
-    model = models.HotCompany
-    template_name = 'company_home.html'

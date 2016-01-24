@@ -11,7 +11,7 @@
             <ul>
                 {% if is_admin %}
                     <li><a href='{% url "company-add" %}' class="mws-ic-16 ic-add">Create Website</a></li>
-                    <li><a href='{% url "company-home" %}' class="mws-ic-16 ic-edit">Order Management</a></li>
+{#                    <li><a href='{% url "company-home" %}' class="mws-ic-16 ic-edit">Order Management</a></li>#}
                 {% endif %}
             </ul>
         </div>
@@ -37,7 +37,11 @@
                     <td>{{ c.status }}</td>
                     <td>{{ c.create_time }}</td>
                     <td>{{ c.tag }}</td>
-                    <td>{{ c.is_index }}</td>
+                    {% if c.is_index %}
+                        <td>{{ c.dis_order }}</td>
+                    {% else %}
+                        <td>{{ c.is_index }}</td>
+                    {% endif %}
                     <td><a href='{% url "company-detail" c.pk %}'><img src="{% static 'css/icons/16/view.png' %}" alt="Detail" width="24" height="24" border="0"></a></td>
                 </tr>
                 {% endfor %}

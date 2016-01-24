@@ -145,6 +145,16 @@
                         {% endif %}
                     </div>
                 </div>
+                     <div class="mws-form-row">
+                    <label>Order</label>
+
+                    <div class="mws-form-item medium" style="margin-top:10px;">
+                        {{ form.dis_order }}
+                        {% if form.dis_order.errors %}
+                            <label class='error'>{{form.dis_order.errors.0}}</label>
+                        {% endif %}
+                    </div>
+                </div>
                 {% endif %} 
 
                 <div class="mws-button-row">

@@ -82,6 +82,12 @@
                     <td>Show in Homepage</td>
                     <td>{{object.is_index}}</td>
                 </tr>
+                {% if object.is_index %}
+                <tr class="gradeX">
+                    <td>Order in Homepage</td>
+                    <td>{{object.dis_order}}</td>
+                </tr>
+                {% endif %}
                 <tr class="gradeX">
                     <td>Tag</td>
                     <td>{{tag}}</td>

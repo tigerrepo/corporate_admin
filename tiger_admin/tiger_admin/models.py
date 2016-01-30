@@ -113,6 +113,7 @@ class Contact(models.Model):
 
 class Tag(models.Model):
     name = models.CharField(max_length=64, unique=True)
+    class_name = models.CharField(max_length=64, unique=True)
     status = models.SmallIntegerField(choices=Account.STATUS_CHOICES, default=1)
     class Meta:
         db_table = 'tag_tab'

@@ -21,6 +21,16 @@
                     </div>
                 </div>
                 <div class="mws-form-row">
+                    <label>Class Name</label>
+
+                    <div class="mws-form-item medium">
+                        {{ form.class_name }}
+                        {% if form.class_name.errors %}
+                            <label class='error'>{{form.class_name.errors.0}}</label>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="mws-form-row">
                     <label>Status</label>
 
                     <div class="mws-form-item medium">

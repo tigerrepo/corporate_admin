@@ -133,7 +133,7 @@ class CategoryCreateForm(forms.ModelForm):
 
     class Meta:
         model = models.Tag
-        fields = ['name', 'status']
+        fields = ['name', 'class_name', 'status']
 
 class ProductCreateForm(forms.ModelForm):
     # description = forms.CharField(widget=forms.Textarea, required=False)

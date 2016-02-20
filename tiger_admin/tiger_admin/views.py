@@ -370,6 +370,12 @@ class CompanyUpdateView(UpdateView):
     def form_valid(self, form):
         try:
             with transaction.atomic(using='tiger_admin'):
+                print form.cleaned_data['dis_order']
+                print self.object.dis_order
+                if form.cleaned_data['dis_order'] is None:
+                    form.instance.dis_order = self.object.dis_order
+                if not form.instance.dis_order:
+                    form.instance.dis_order = 0
                 self.object = form.save()
 
                 if form.cleaned_data['pdf_url'] is not None:
@@ -383,7 +389,6 @@ class CompanyUpdateView(UpdateView):
                         directory = '%s%s' % (settings.LOGO_ROOT, self.object.id)
                         logo_url = upload_image(form.cleaned_data['logo_url'], directory)
                         self.object.logo_url = logo_url
-
                 self.object.save()
 
                 try:
@@ -419,6 +424,7 @@ class CompanyUpdateView(UpdateView):
 
     def get_success_url(self):
         return reverse('company-detail', kwargs={'pk': self.object.pk})
+
 
 class CompanyDeleteView(DeleteView):
     model = models.Company

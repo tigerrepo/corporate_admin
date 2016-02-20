@@ -97,6 +97,7 @@ class CompanyUpdateForm(forms.ModelForm):
         self.fields['slogan'].required = False
         self.fields['fax'].required = False
         self.fields['description'].required = False
+        self.fields['dis_order'].required = False
 
     def clean_url(self):
         return self.cleaned_data['url'].lower()

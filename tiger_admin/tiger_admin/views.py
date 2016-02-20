@@ -279,7 +279,13 @@ class CompanyCreateView(CreateView):
                     directory = '%s%s' % (settings.PDF_ROOT, self.object.id)
                     pdf_url = upload_image(form.cleaned_data['pdf_url'], directory)
                     self.object.pdf_url = pdf_url
-                    self.object.save()
+
+                if form.cleaned_data['logo_url'] is not None:
+                    directory = '%s%s' % (settings.LOGO_ROOT, self.object.id)
+                    logo_url = upload_image(form.cleaned_data['logo_url'], directory)
+                    self.object.logo_url = logo_url
+
+                self.object.save()
 
                 video_url = form.cleaned_data['video_url']
                 name = video_url.split("=")[-1]
@@ -311,7 +317,6 @@ class CompanyDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super(CompanyDetailView, self).get_context_data(**kwargs)
         context['domain'] = settings.DOMAIN_NAME
-        account = self.kwargs['account']
         is_admin = self.kwargs['is_admin']
 
         company_tag_dict = collections.defaultdict(list)
@@ -321,6 +326,11 @@ class CompanyDetailView(DetailView):
         context['tag'] = ','.join(company_tag_dict.get(self.object.pk, []))
         if self.get_object().pdf_url != "":
             context['pdf_url'] = '%s%s/%s' % (settings.PDF_URL, self.get_object().id, self.get_object().pdf_url)
+
+        if self.get_object().logo_url:
+            context['logo_url'] = '%s%s/%s' % (settings.LOGO_URL, self.get_object().id, self.get_object().logo_url)
+        else:
+            context['logo_url'] = ''
 
         try:
             video = models.Video.objects.get(company=self.get_object())
@@ -337,12 +347,8 @@ class CompanyUpdateView(UpdateView):
     template_name = 'company_update.html'
 
     def get_initial(self):
-        try:
-            video = models.Video.objects.get(company=self.object)
-            youtube_url = "%s%s" % (settings.YOUTUBE_URL_PREFIX, video.name)
-        except models.Video.DoesNotExist:
-            youtube_url = ''
 
+        video = get_object_or_404(models.Video, company=self.object)
         try:
             tag = models.CompanyTag.objects.get(company=self.object)
             tag_val = tag.tag_id
@@ -371,7 +377,14 @@ class CompanyUpdateView(UpdateView):
                         directory = '%s%s' % (settings.PDF_ROOT, self.object.id)
                         pdf_url = upload_image(form.cleaned_data['pdf_url'], directory)
                         self.object.pdf_url = pdf_url
-                        self.object.save()
+
+                if form.cleaned_data['logo_url'] is not None:
+                    if form.cleaned_data['logo_url'] != self.object.logo_url:
+                        directory = '%s%s' % (settings.LOGO_ROOT, self.object.id)
+                        logo_url = upload_image(form.cleaned_data['logo_url'], directory)
+                        self.object.logo_url = logo_url
+
+                self.object.save()
 
                 try:
                     video = models.Video.objects.get(company=self.object)

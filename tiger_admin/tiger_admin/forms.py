@@ -49,6 +49,7 @@ class CompanyCreateForm(forms.ModelForm):
         self.fields['fax'].required = False
         self.fields['pdf_url'].required = False
         self.fields['description'].required = False
+        self.fields['logo_url'].required = False
 
     def clean_url(self):
         return self.cleaned_data['url'].lower()
@@ -79,7 +80,7 @@ class CompanyCreateForm(forms.ModelForm):
 
     class Meta:
         model = models.Company
-        fields = ['name', 'slogan', 'url', 'description', 'pdf_url', 'is_index', 'address', 'tel', 'email', 'fax', 'account', 'dis_order']
+        fields = ['name', 'slogan', 'url', 'description', 'pdf_url', 'is_index', 'address', 'tel', 'email', 'fax', 'account', 'dis_order', 'logo_url']
 
 class CompanyUpdateForm(forms.ModelForm):
     # description = forms.CharField(widget=forms.Textarea, required=False)
@@ -92,6 +93,7 @@ class CompanyUpdateForm(forms.ModelForm):
         for field in self:
             field.field.widget.attrs['class']='mws-textinput'
         self.fields['pdf_url'].required = False
+        self.fields['logo_url'].required = False
         self.fields['slogan'].required = False
         self.fields['fax'].required = False
         self.fields['description'].required = False
@@ -122,7 +124,7 @@ class CompanyUpdateForm(forms.ModelForm):
 
     class Meta:
         model = models.Company
-        fields = ['name', 'slogan', 'url', 'description', 'pdf_url', 'is_index', 'address', 'tel', 'email', 'fax', 'account', 'dis_order']
+        fields = ['name', 'slogan', 'url', 'description', 'pdf_url', 'is_index', 'address', 'tel', 'email', 'fax', 'account', 'dis_order', 'logo_url']
 
 
 class CategoryCreateForm(forms.ModelForm):

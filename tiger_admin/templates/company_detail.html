@@ -30,6 +30,12 @@
                     <td>Name</td>
                     <td>{{object.name}}</td>
                 </tr>
+                {% if logo_url != '' %}
+                <tr class="gradeX">
+                    <td>LOGO</td>
+                    <td><img src=logo_url style="height:30px;" /></td>
+                </tr>
+                {% endif %}
                 <tr class="gradeX">
                     <td>Slogan</td>
                     <td>{{object.slogan}}</td>

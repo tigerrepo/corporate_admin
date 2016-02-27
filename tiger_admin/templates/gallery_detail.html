@@ -8,7 +8,7 @@
     <div class="mws-panel-body">
         <div class="mws-panel-toolbar top clearfix">
         	<ul>
-        	    <li><a href="{% url 'product-image-list' %}" class="mws-ic-16 ic-arrow-left" >Back</a></li>
+        	    <li><a href="{% url 'product-image-list' product %}" class="mws-ic-16 ic-arrow-left" >Back</a></li>
                   <li><a href='{% url "gallery-update" product object.pk %}' class="mws-ic-16 ic-edit">Edit</a></li>
                   <li><a href='{% url "gallery-delete" product object.pk %}' class="mws-ic-16 ic-delete">Delete</a></li>
             </ul>

@@ -1,5 +1,6 @@
 import models
 
+
 def common(request):
     if request.user.is_authenticated():
         account = models.Account.objects.get(username__exact=request.user.username)
@@ -10,4 +11,4 @@ def common(request):
         }
         return vals
     else:
-        return {}
+        return dict()

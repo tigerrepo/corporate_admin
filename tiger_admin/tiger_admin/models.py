@@ -4,21 +4,22 @@ from django.contrib.auth.models import User
 from django.db.models.signals import pre_save, post_delete
 from django.dispatch import receiver
 
+
 class Account(models.Model):
     username = models.CharField(max_length=32, unique=True)
     email = models.CharField(max_length=32, unique=True)
     password = models.CharField(max_length=64)
     salt = models.CharField(max_length=32)
-    STATUS_ENABLE=1
-    STATUS_DISABLE=0
+    STATUS_ENABLE = 1
+    STATUS_DISABLE = 0
     STATUS_CHOICES = (
         (STATUS_ENABLE, 'Activated'),
         (STATUS_DISABLE, 'Deactivated'),
     )
     status = models.SmallIntegerField(choices=STATUS_CHOICES, default=1)
     create_time = models.DateTimeField(auto_now_add=True)
-    ACCOUNT_TYPE_ADMIN=0
-    ACCOUNT_TYPE_CUSTOMER=1
+    ACCOUNT_TYPE_ADMIN = 0
+    ACCOUNT_TYPE_CUSTOMER = 1
     ACCOUNT_TYPE_CHOICES = (
         (ACCOUNT_TYPE_CUSTOMER, u'Customer Admin'),
         (ACCOUNT_TYPE_ADMIN, u'System Admin'),
@@ -30,7 +31,6 @@ class Account(models.Model):
 
     def __unicode__(self):
         return self.username
-
 
 
 @receiver(pre_save, sender=Account)
@@ -51,6 +51,7 @@ def create_user_if_not_exist(sender, **kwargs):
         user.email = instance.email
         user.save()
 
+
 @receiver(post_delete, sender=Account)
 def delete_user(sender, instance=None, **kwargs):
     try:
@@ -59,6 +60,7 @@ def delete_user(sender, instance=None, **kwargs):
         pass
     else:
         user.delete()
+
 
 class Company(models.Model):
     name = models.CharField(max_length=255, unique=True)
@@ -86,6 +88,7 @@ class Company(models.Model):
     def __unicode__(self):
         return self.name
 
+
 class Video(models.Model):
     name = models.CharField(max_length=64)
     description = models.CharField(max_length=1024)
@@ -96,6 +99,7 @@ class Video(models.Model):
     class Meta:
         unique_together = ('name', 'company')
         db_table = "video_tab"
+
 
 class Contact(models.Model):
     sender = models.CharField(max_length=32)
@@ -112,15 +116,18 @@ class Contact(models.Model):
     def __unicode__(self):
         return self.title
 
+
 class Tag(models.Model):
     name = models.CharField(max_length=64, unique=True)
     class_name = models.CharField(max_length=64, unique=True)
     status = models.SmallIntegerField(choices=Account.STATUS_CHOICES, default=1)
+
     class Meta:
         db_table = 'tag_tab'
 
     def __unicode__(self):
         return self.name
+
 
 class CompanyTag(models.Model):
     company = models.ForeignKey(Company, on_delete=models.PROTECT)
@@ -130,13 +137,14 @@ class CompanyTag(models.Model):
         unique_together = ('company', 'tag')
         db_table = 'company_tag_tab'
 
+
 class Product(models.Model):
     company = models.ForeignKey(Company, on_delete=models.PROTECT)
     name = models.CharField(max_length=255)
     description = RichTextField()
     create_date = models.DateTimeField(auto_now_add=True)
     status = models.SmallIntegerField(choices=Account.STATUS_CHOICES, default=1)
-    #pdf_url = models.FileField(upload_to='pdf', max_length=64)
+    # pdf_url = models.FileField(upload_to='pdf', max_length=64)
 
     class Meta:
         unique_together = ('company', 'name')
@@ -144,6 +152,7 @@ class Product(models.Model):
 
     def __unicode__(self):
         return self.name
+
 
 class Gallery(models.Model):
     name = models.CharField(max_length=64)
@@ -164,8 +173,8 @@ class Enquiry(models.Model):
     company = models.CharField(max_length=128)
     email = models.CharField(max_length=64)
     mobile = models.CharField(max_length=20)
-    REGION_TYPE_SG=0
-    REGION_TYPE_CN=1
+    REGION_TYPE_SG = 0
+    REGION_TYPE_CN = 1
     REGION_TYPE_CHOICES = (
         (REGION_TYPE_SG, u'Singapore'),
         (REGION_TYPE_CN, u'China'),

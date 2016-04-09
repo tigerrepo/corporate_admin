@@ -2,7 +2,7 @@ import os
 import string
 import random
 import datetime
-from django.conf import settings
+
 
 def generate_random_password(length=16, charset=string.ascii_letters + string.digits):
     random.seed = (os.urandom(1024))
@@ -11,6 +11,7 @@ def generate_random_password(length=16, charset=string.ascii_letters + string.di
 
 def format_date(date, orig_format, res_format):
     return datetime.datetime.strptime(date, orig_format).strftime(res_format)
+
 
 def upload_image(f, directory):
     ext = str(f).split(".")[-1]
@@ -22,6 +23,7 @@ def upload_image(f, directory):
         for chunk in f.chunks():
             destination.write(chunk)
     return filename
+
 
 def upload_pdf(f, directory):
     ext = str(f).split(".")[-1]

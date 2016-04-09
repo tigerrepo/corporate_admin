@@ -1,12 +1,10 @@
 import collections
-import hashlib
 import logging
 import string
-import time
 
 import django
 from django.contrib import messages
-from django.contrib.auth import authenticate, logout
+from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
@@ -18,24 +16,27 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import (get_object_or_404, redirect, render,
                               render_to_response)
 from django.template import RequestContext
-from django.views.generic import View
 from django.views.generic.detail import DetailView
-from django.views.generic.edit import (CreateView, DeleteView, FormView,
-                                       UpdateView)
+from django.views.generic.edit import (CreateView, DeleteView, UpdateView)
 from django.views.generic.list import ListView
+from utils import generate_random_password, upload_image
 
-from tiger_admin import forms, models, settings
-from utils import format_date, generate_random_password, upload_image
+import forms
+import models
+import settings
 
 logger = logging.getLogger('main')
+
 
 def check_account_permission(user):
     login_account = get_object_or_404(models.Account, username=user.username)
     return login_account.account_type == models.Account.ACCOUNT_TYPE_ADMIN
 
+
 @login_required
 def home(request):
     return render(request, 'base.html')
+
 
 @login_required
 def admin_list(request):
@@ -61,6 +62,7 @@ def admin_list(request):
         context_instance=RequestContext(request)
     )
 
+
 @login_required
 @user_passes_test(check_account_permission)
 def update_status(request, pk):
@@ -76,15 +78,16 @@ def update_status(request, pk):
     except Exception as e:
         logger.error("Account %s updated status fail, roll back.", account.username)
         # add error page
-        return redirect(reverse('admin-detail', kwargs={'pk':pk}))
+        return redirect(reverse('admin-detail', kwargs={'pk': pk}))
 
     logger.info("Account %s has been updated status, %s, done by %s",
                 account.username, account.status, request.user)
     return redirect(reverse('admin-detail', kwargs={'pk':pk}))
 
+
 @login_required
 def update_company_status(request, pk):
-    #check company owner or admin
+    # check company owner or admin
     company = models.Company.objects.get(pk=pk)
     company.status = not company.status
     company.save()
@@ -92,6 +95,7 @@ def update_company_status(request, pk):
     logger.info("Website %s has been updated status, %s, done by %s",
                 company.name, company.status, request.user)
     return redirect(reverse('company-detail', kwargs={'pk':pk}))
+
 
 @login_required
 @user_passes_test(check_account_permission)
@@ -107,7 +111,7 @@ def password_reset(request, pk):
     if settings.SENT_EMAIL:
         msg_txt = 'Your password is reset to %s, please login and change your password.' % password
 
-        MSG = string.join((
+        msg = string.join((
             "From: %s" % settings.EMAIL_HOST_USER,
             "To: %s" % account.email,
             "Subject: Notification" ,
@@ -115,7 +119,7 @@ def password_reset(request, pk):
             msg_txt
             ), "\r\n")
 
-        send_mail('Notification', MSG, settings.EMAIL_HOST_USER, [account.email], fail_silently=False)
+        send_mail('Notification', msg, settings.EMAIL_HOST_USER, [account.email], fail_silently=False)
     return redirect(reverse('admin-detail', kwargs={'pk':pk}))
 
 
@@ -151,9 +155,10 @@ def admin_add(request):
         u.save()
         logger.info("Account %s, %s, %s has been created by %s", username, password, account_type, request.user)
         if settings.SENT_EMAIL:
-            msg_txt = 'Your email is generated, please use %s as password to login. For your safety, please change your password once you login the system' % password
+            msg_txt = 'Your email is generated, please use %s as password to login. ' \
+                      'For your safety, please change your password once you login the system' % password
 
-            MSG = string.join((
+            msg = string.join((
                 "From: %s" % settings.EMAIL_HOST_USER,
                 "To: %s" % u.email,
                 "Subject: Notification" ,
@@ -161,9 +166,10 @@ def admin_add(request):
                 msg_txt
                 ), "\r\n")
 
-            send_mail('Notification', MSG, settings.EMAIL_HOST_USER, [u.email], fail_silently=False)
+            send_mail('Notification', msg, settings.EMAIL_HOST_USER, [u.email], fail_silently=False)
 
     return redirect('/admin')
+
 
 class AccountDetailView(DetailView):
     model = models.Account
@@ -174,6 +180,7 @@ class AccountDetailView(DetailView):
         context['login_user'] = self.kwargs['account']
         return context
 
+
 class AccountDeleteView(DeleteView):
     model = models.Account
     template_name = 'admin_delete_form.html'
@@ -181,6 +188,7 @@ class AccountDeleteView(DeleteView):
     def get_success_url(self):
         logger.info("Account %s has been deleted by %s", self.object.username, self.request.user)
         return reverse('admin-list')
+
 
 class AccountPasswordResetView(UpdateView):
     model = models.Account
@@ -208,6 +216,7 @@ class AccountPasswordResetView(UpdateView):
 
         return redirect(reverse('admin-detail', kwargs={'pk': self.object.pk}))
 
+
 class AccountCompanyListView(ListView):
     model = models.Company
     template_name = 'company_list.html'
@@ -221,6 +230,7 @@ class AccountCompanyListView(ListView):
         context['domain'] = settings.DOMAIN_NAME
         context['is_admin'] = self.kwargs['is_admin']
         return context
+
 
 class CompanyListView(ListView):
     model = models.Company
@@ -237,12 +247,12 @@ class CompanyListView(ListView):
             company_list = models.Company.objects.filter(account=account)
 
         company_tag_dict = collections.defaultdict(list)
-        for company_tag in models.CompanyTag.objects.select_related("Tag").all():
+        for company_tag in models.CompanyTag.objects.select_related("tag").all():
             company_tag_dict[company_tag.company_id].append(company_tag.tag.name)
 
         company_list_with_tag = []
         for company in company_list:
-            company_dict = {}
+            company_dict = dict()
             company_dict['name'] = company.name
             company_dict['url'] = company.url
             company_dict['account'] = company.account
@@ -259,6 +269,7 @@ class CompanyListView(ListView):
         context['domain'] = settings.DOMAIN_NAME
         return context
 
+
 class CompanyCreateView(CreateView):
     model = models.Company
     form_class = forms.CompanyCreateForm
@@ -273,19 +284,19 @@ class CompanyCreateView(CreateView):
     def form_valid(self, form):
         try:
             with transaction.atomic(using='tiger_admin'):
-                self.object = form.save()
+                object = form.save()
 
                 if form.cleaned_data['pdf_url'] is not None:
-                    directory = '%s%s' % (settings.PDF_ROOT, self.object.id)
+                    directory = '%s%s' % (settings.PDF_ROOT, object.id)
                     pdf_url = upload_image(form.cleaned_data['pdf_url'], directory)
-                    self.object.pdf_url = pdf_url
+                    object.pdf_url = pdf_url
 
                 if form.cleaned_data['logo_url'] is not None:
-                    directory = '%s%s' % (settings.LOGO_ROOT, self.object.id)
+                    directory = '%s%s' % (settings.LOGO_ROOT, object.id)
                     logo_url = upload_image(form.cleaned_data['logo_url'], directory)
-                    self.object.logo_url = logo_url
+                    object.logo_url = logo_url
 
-                self.object.save()
+                object.save()
 
                 video_url = form.cleaned_data['video_url']
                 name = video_url.split("=")[-1]
@@ -293,14 +304,14 @@ class CompanyCreateView(CreateView):
                     name=name,
                     description='',
                     video_url=video_url,
-                    host_url='%s/%s.mp4' % (self.object.id, self.object.id),
-                    company=self.object)
+                    host_url='%s/%s.mp4' % (object.id, object.id),
+                    company=object)
 
                 tag = form.cleaned_data['tag']
-                models.CompanyTag.objects.get_or_create(company=self.object, tag=tag)
+                models.CompanyTag.objects.get_or_create(company=object, tag=tag)
         except Exception as e:
-            logger.error("create Website fail, roll back, website %s, operate by %s", form.cleaned_data['name'], self.request.user)
-            print e
+            logger.error("create Website fail, roll back, website %s, operate by %s. Exception: %s",
+                         form.cleaned_data['name'], self.request.user, str(e))
             # add error in page
             return super(CompanyCreateView, self).form_invalid(form)
 
@@ -309,6 +320,7 @@ class CompanyCreateView(CreateView):
 
     def get_success_url(self):
         return reverse('company-list')
+
 
 class CompanyDetailView(DetailView):
     model = models.Company
@@ -320,7 +332,7 @@ class CompanyDetailView(DetailView):
         is_admin = self.kwargs['is_admin']
 
         company_tag_dict = collections.defaultdict(list)
-        for company_tag in models.CompanyTag.objects.select_related("Tag").all():
+        for company_tag in models.CompanyTag.objects.select_related("tag").all():
             company_tag_dict[company_tag.company_id].append(company_tag.tag.name)
 
         context['tag'] = ','.join(company_tag_dict.get(self.object.pk, []))
@@ -341,6 +353,7 @@ class CompanyDetailView(DetailView):
         context['is_admin'] = is_admin
         return context
 
+
 class CompanyUpdateView(UpdateView):
     model = models.Company
     form_class = forms.CompanyUpdateForm
@@ -354,7 +367,7 @@ class CompanyUpdateView(UpdateView):
             tag_val = tag.tag_id
         except Exception as e:
             tag_val = 0
-        initials = {}
+        initials = dict()
         initials['video_url'] = video.video_url
         initials['tag'] = tag_val
         return initials
@@ -365,6 +378,7 @@ class CompanyUpdateView(UpdateView):
             context['pdf_url'] = ''
         else:
             context['pdf_url'] = '%s%s/%s' % (settings.PDF_URL, self.object.id, self.object.pdf_url)
+
         return context
 
     def form_valid(self, form):
@@ -376,46 +390,45 @@ class CompanyUpdateView(UpdateView):
                     form.instance.dis_order = self.object.dis_order
                 if not form.instance.dis_order:
                     form.instance.dis_order = 0
-                self.object = form.save()
+                object = form.save()
 
                 if form.cleaned_data['pdf_url'] is not None:
-                    if form.cleaned_data['pdf_url'] != self.object.pdf_url:
-                        directory = '%s%s' % (settings.PDF_ROOT, self.object.id)
+                    if form.cleaned_data['pdf_url'] != object.pdf_url:
+                        directory = '%s%s' % (settings.PDF_ROOT, object.id)
                         pdf_url = upload_image(form.cleaned_data['pdf_url'], directory)
-                        self.object.pdf_url = pdf_url
+                        object.pdf_url = pdf_url
 
                 if form.cleaned_data['logo_url'] is not None:
-                    if form.cleaned_data['logo_url'] != self.object.logo_url:
-                        directory = '%s%s' % (settings.LOGO_ROOT, self.object.id)
+                    if form.cleaned_data['logo_url'] != object.logo_url:
+                        directory = '%s%s' % (settings.LOGO_ROOT, object.id)
                         logo_url = upload_image(form.cleaned_data['logo_url'], directory)
-                        self.object.logo_url = logo_url
-                self.object.save()
+                        object.logo_url = logo_url
+                object.save()
 
                 try:
-                    video = models.Video.objects.get(company=self.object)
+                    video = models.Video.objects.get(company=object)
                     if form.cleaned_data['video_url'] !=  video.video_url:
                         video_url = form.cleaned_data['video_url']
                         name = video_url.split("=")[-1]
-                        models.Video.objects.filter(company=self.object).update(
+                        models.Video.objects.filter(company=object).update(
                                 name=name,
                                 description='',
                                 video_url=video_url,
-                                host_url='%s/%s.mp4' % (self.object.id, self.object.id))
+                                host_url='%s/%s.mp4' % (object.id, object.id))
                 except models.Video.DoesNotExist:
                         video_url = form.cleaned_data['video_url']
                         name = video_url.split("=")[-1]
-                        models.Video.objects.filter(company=self.object).update(
+                        models.Video.objects.filter(company=object).update(
                                 name=name,
                                 description='',
                                 video_url=video_url,
-                                host_url='%s/%s.mp4' % (self.object.id, self.object.id))
-
+                                host_url='%s/%s.mp4' % (object.id, object.id))
 
                 tag = form.cleaned_data['tag']
-                models.CompanyTag.objects.filter(company=self.object).update(tag=tag)
+                models.CompanyTag.objects.filter(company=object).update(tag=tag)
         except Exception as e:
-            print e
-            logger.error("update Website fail, roll back, website %s, operate by %s", form.cleaned_data['name'], self.request.user)
+            logger.error("update Website fail, roll back, website %s, operate by %s. Exception: %s",
+                         form.cleaned_data['name'], self.request.user, str(e))
             # add error in page
             return super(CompanyUpdateView, self).form_invalid(form)
 
@@ -434,6 +447,7 @@ class CompanyDeleteView(DeleteView):
         logger.info("Website %s has been deleted by %s", self.object.name, self.request.user)
         return reverse('company-list')
 
+
 class CompanyProductListView(ListView):
     model = models.Product
     template_name = 'product_list.html'
@@ -446,6 +460,7 @@ class CompanyProductListView(ListView):
         context['can_add'] = self.kwargs['is_superuser'] or self.kwargs['is_owner']
         return context
 
+
 class CompanyMessageListView(ListView):
     model = models.Contact
     template_name = 'message_list.html'
@@ -456,6 +471,7 @@ class CompanyMessageListView(ListView):
         company = get_object_or_404(models.Company, pk=pk)
         context['object_list'] = models.Contact.objects.filter(company=company)
         return context
+
 
 class MessageListView(ListView):
     model = models.Contact
@@ -473,9 +489,11 @@ class MessageListView(ListView):
             context['object_list'] = models.Contact.objects.filter(company__in=companies)
         return context
 
+
 class MessageDetailView(DetailView):
     model = models.Contact
     template_name = 'message_detail.html'
+
 
 class CategoryCreateView(CreateView):
     model = models.Tag
@@ -485,6 +503,7 @@ class CategoryCreateView(CreateView):
     def get_success_url(self):
         logger.info("Category %s has been updated by %s", self.object.name, self.request.user)
         return reverse('category-list')
+
 
 class CategoryListView(ListView):
     model = models.Tag
@@ -506,10 +525,11 @@ class CategoryDeleteView(DeleteView):
             self.get_object().delete()
             logger.info("Category %s has been deleted by %s", name, self.request.user)
             return HttpResponseRedirect(self.get_success_url())
+
         except Exception as e:
             messages.error(request,
                            'Delete category failed, there are corporates with this tag exists')
-            return HttpResponseRedirect(reverse('category-detail', kwargs={"pk":self.get_object().id}))
+            return HttpResponseRedirect(reverse('category-detail', kwargs={"pk": self.get_object().id}))
 
     def get_success_url(self):
         return reverse('category-list')
@@ -535,7 +555,8 @@ class ProductCreateView(CreateView):
         account = models.Account.objects.get(username=self.request.user.username)
         is_admin = account.account_type == models.Account.ACCOUNT_TYPE_ADMIN
         if not is_admin:
-            context['form'].fields['company'] = django.forms.ModelChoiceField(queryset=models.Company.objects.filter(account=account))
+            context['form'].fields['company'] = django.forms.ModelChoiceField(
+                queryset=models.Company.objects.filter(account=account))
         return context
 
     def form_valid(self, form):
@@ -545,6 +566,7 @@ class ProductCreateView(CreateView):
 
     def get_success_url(self):
         return reverse('product-list')
+
 
 class ProductListView(ListView):
     model = models.Product
@@ -561,14 +583,16 @@ class ProductListView(ListView):
         context['can_add'] = self.request.user.is_superuser or not is_admin
         return context
 
+
 class ProductDetailView(DetailView):
     model = models.Product
     template_name = 'product_detail.html'
 
     def get_context_data(self, **kwargs):
         context = super(ProductDetailView, self).get_context_data(**kwargs)
-        account = models.Account.objects.get(username=self.request.user.username)
+        models.Account.objects.get(username=self.request.user.username)
         return context
+
 
 class ProductDeleteView(DeleteView):
     model = models.Product
@@ -583,10 +607,11 @@ class ProductDeleteView(DeleteView):
         except Exception as e:
             messages.error(request,
                            'Delete product failed, there are images in this product.')
-            return HttpResponseRedirect(reverse('product-detail', kwargs={"pk":self.get_object().id}))
+            return HttpResponseRedirect(reverse('product-detail', kwargs={"pk": self.get_object().id}))
 
     def get_success_url(self):
         return reverse('product-list')
+
 
 class ProductUpdateView(UpdateView):
     model = models.Product
@@ -596,6 +621,7 @@ class ProductUpdateView(UpdateView):
     def get_success_url(self):
         logger.info("Product %s has been updated by %s", self.get_object().name, self.request.user)
         return reverse('product-detail', kwargs={'pk': self.get_object().pk})
+
 
 class ProductImageListView(ListView):
     model = models.Gallery
@@ -609,6 +635,7 @@ class ProductImageListView(ListView):
         context['url_prefix'] = settings.IMAGE_URL_PREFIX
         return context
 
+
 class GalleryDetailView(DetailView):
     model = models.Gallery
     template_name = 'gallery_detail.html'
@@ -617,6 +644,7 @@ class GalleryDetailView(DetailView):
         context = super(GalleryDetailView, self).get_context_data(**kwargs)
         context['url_prefix'] = settings.IMAGE_URL_PREFIX
         return context
+
 
 class GalleryCreateView(CreateView):
     model = models.Gallery
@@ -644,6 +672,7 @@ class GalleryCreateView(CreateView):
         logger.info("Image has been uploaded by %s", self.request.user)
         return reverse('product-image-list', kwargs={'pk': pk})
 
+
 class GalleryDetailView(DetailView):
     model = models.Gallery
     template_name = 'gallery_detail.html'
@@ -664,6 +693,7 @@ class GalleryDeleteView(DeleteView):
         pk = self.kwargs.get('ppk', 0)
         logger.info("Image %s has been deleted by %s", self.object.name, self.request.user)
         return reverse('product-image-list', kwargs={'pk': pk})
+
 
 class GalleryUpdateView(UpdateView):
     model = models.Gallery

@@ -1,12 +1,13 @@
-from django.conf.urls import patterns, include, url
+from django.conf.urls import patterns, url
 from django.http import HttpResponseForbidden
-from tiger_admin import views, models
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.decorators import user_passes_test
 import logging
+import views
+import models
 
 logger = logging.getLogger('main')
+
 
 def check_user_role(func, view_name):
     def wrap(request, *args, **kwargs):
@@ -22,6 +23,7 @@ def check_user_role(func, view_name):
             return HttpResponseForbidden()
         return HttpResponseForbidden()
     return wrap
+
 
 def check_corporate_permission(func, view_name):
     def wrap(request, *args, **kwargs):
@@ -40,6 +42,7 @@ def check_corporate_permission(func, view_name):
         return HttpResponseForbidden()
     return wrap
 
+
 def check_product_permission(func, view_name):
     def wrap(request, *args, **kwargs):
         pk = int(kwargs.get('pk', 0))
@@ -56,6 +59,7 @@ def check_product_permission(func, view_name):
             return func(request, *args, **kwargs)
         return HttpResponseForbidden()
     return wrap
+
 
 def check_gallery_permission(func, view_name):
     def wrap(request, *args, **kwargs):
@@ -93,14 +97,12 @@ def check_message_permission(func, view_name):
         return HttpResponseForbidden()
     return wrap
 
-urlpatterns = patterns('',
-    # Examples:
-    # url(r'^$', 'tiger_admin.views.home', name='home'),
-    # url(r'^blog/', include('blog.urls')),
+urlpatterns = patterns(
+    '',
     url(r'^$', login_required(views.CompanyListView.as_view()),
         name='company-list'),
-    url(r'^login/$', auth_views.login, {'template_name':'login.html'}, name='login'),
-    url(r'^logout/$', auth_views.logout, {'template_name':'login.html'},name='logout'),
+    url(r'^login/$', auth_views.login, {'template_name': 'login.html'}, name='login'),
+    url(r'^logout/$', auth_views.logout, {'template_name': 'login.html'}, name='logout'),
 
     # admin
     url(r'^admin/$', 'tiger_admin.views.admin_list', name='admin-list'),
@@ -109,9 +111,6 @@ urlpatterns = patterns('',
         check_user_role(login_required(views.AccountDetailView.as_view(), "admin-detail"), "admin-detail"),
         name='admin-detail'),
     url(r'^admin/(?P<pk>\d+)/update_status/$', 'tiger_admin.views.update_status', name='admin-update-status'),
-    # url(r'^admin/(?P<pk>\d+)/delete/$',
-        # check_user_role(login_required(views.AccountDeleteView.as_view())),
-        # name='admin-delete'),
     url(r'^admin/(?P<pk>\d+)/password_change/$',
         check_user_role(login_required(views.AccountPasswordResetView.as_view()), "admin-change-password"),
         name='admin-change-password'),
@@ -130,13 +129,8 @@ urlpatterns = patterns('',
     url(r'^corporate/(?P<pk>\d+)/update/$',
         check_corporate_permission(login_required(views.CompanyUpdateView.as_view()), "company-update"),
         name='company-update'),
-    url(r'^corporate/(?P<pk>\d+)/update_status/$', 'tiger_admin.views.update_company_status', name='company-update-status'),
-    # url(r'^corporate/(?P<pk>\d+)/delete/$',
-        # check_corporate_permission(login_required(views.CompanyDeleteView.as_view())),
-        # name='company-delete'),
-    # url(r'^corporate/homepage/$',
-    #     check_user_role(views.CompanyHomepageView.as_view(), "company-home"),
-    #     name='company-home'),
+    url(r'^corporate/(?P<pk>\d+)/update_status/$', 'tiger_admin.views.update_company_status',
+        name='company-update-status'),
     url(r'^corporate/add/$',
         check_user_role(views.CompanyCreateView.as_view(), "company-add"),
         name='company-add'),

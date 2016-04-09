@@ -61,6 +61,24 @@ def check_product_permission(func, view_name):
     return wrap
 
 
+def check_pdf_permission(func, view_name):
+    def wrap(request, *args, **kwargs):
+        pk = int(kwargs.get('pk', 0))
+        account = models.Account.objects.get(username__exact=request.user.username)
+        kwargs['is_admin'] = account.account_type == models.Account.ACCOUNT_TYPE_ADMIN
+        kwargs['account'] = account
+        companies = list(c.id for c in models.Company.objects.filter(account=account))
+        try:
+            kwargs['is_owner'] = models.PDF.objects.get(pk=pk, company_id__in=companies)
+        except models.PDF.DoesNotExist:
+            kwargs['is_owner'] = False
+        if kwargs['is_admin'] or kwargs['is_owner']:
+            logger.info("access user:%s, view:%s", request.user.username, view_name)
+            return func(request, *args, **kwargs)
+        return HttpResponseForbidden()
+    return wrap
+
+
 def check_gallery_permission(func, view_name):
     def wrap(request, *args, **kwargs):
         pk = int(kwargs.get('pk', 0))
@@ -140,6 +158,9 @@ urlpatterns = patterns(
     url(r'^corporate/(?P<pk>\d+)/message/$',
         check_corporate_permission(login_required(views.CompanyMessageListView.as_view()), "company-message-list"),
         name='company-message-list'),
+    url(r'^corporate/(?P<pk>\d+)/pdf/$',
+        check_corporate_permission(login_required(views.CompanyPDFListView.as_view()), "company-pdf-list"),
+        name='company-pdf-list'),
 
     # tag
     url(r'^category/$',
@@ -172,6 +193,19 @@ urlpatterns = patterns(
     url(r'^product/(?P<pk>\d+)/delete/$',
         check_product_permission(login_required(views.ProductDeleteView.as_view()), "product-delete"),
         name='product-delete'),
+
+    # pdf
+    url(r'^pdf/(?P<pk>\d+)/add/$',
+        check_pdf_permission(login_required(views.PDFCreateView.as_view()), 'pdf-add'),
+        name='pdf-add'),
+    url(r'^pdf/(?P<pk>\d+)/detail/$',
+        check_pdf_permission(login_required(views.PDFDetailView.as_view()), 'pdf-detail'),
+        name='pdf-detail'),
+    url(r'^pdf/(?P<pk>\d+)/update/$',
+        check_pdf_permission(login_required(views.PDFUpdateView.as_view()), "pdf-update"),
+        name='pdf-update'),
+    url(r'^pdf/(?P<pk>\d+)/update_status/$', 'tiger_admin.views.update_pdf_status',
+        name='pdf-update-status'),
 
     # gallery
     url(r'^product/(?P<pk>\d+)/gallery/$',

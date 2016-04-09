@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="mws-panel grid_8">
+	<div class="mws-panel-header">
+    	<span class="mws-i-24 i-table-1">Detail of PDF</span>
+    </div>
+    <div class="mws-panel-body">
+        <div class="mws-panel-toolbar top clearfix">
+        	<ul>
+        	    <li><a href="{% url 'company-pdf-list' object.company_id %}" class="mws-ic-16 ic-arrow-left">Back</a></li>
+                <li><a href='{% url "pdf-update" object.id %}' class="mws-ic-16 ic-pencil">Edit Info</a></li>
+                {% if object.status %}
+                    <li><a href='{% url "pdf-update-status" object.pk %}' class="mws-ic-16 ic-pencil">Deactivate</a></li>
+                {% else %}
+                    <li><a href='{% url "pdf-update-status" object.pk %}' class="mws-ic-16 ic-accept">Release</a></li>
+                {% endif %}
+            </ul>
+        </div>
+        <table class="mws-table" id="datatable">
+            <tbody>
+                <tr class="gradeX">
+                    <td>Name</td>
+                    <td>{{object.name}}</td>
+                </tr>
+                <tr class="gradeX">
+                    <td>PDF URL</td>
+                    <td><a href="{{ url }}">{{ url }}</a></td>
+                </tr>
+                <tr class="gradeX">
+                    <td>Status</td>
+                    <td>{{object.get_status_display}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+

@@ -70,17 +70,17 @@
                         {% endif %}
                     </div>
                 </div>
-                <div class="mws-form-row">
-                    <label>PDF Upload (Optional)</label>
-
-                    <div class="mws-form-item medium">
-                        {{ form.pdf_url }}
-                        <br/> <span style="color:red;">Please Upload PDF file </span> 
-                        {% if form.pdf_url.errors %}
-                            <label class='error'>{{form.pdf_url.errors.0}}</label>
-                        {% endif %}
-                    </div>
-                </div>
+{#                <div class="mws-form-row">#}
+{#                    <label>PDF Upload (Optional)</label>#}
+{##}
+{#                    <div class="mws-form-item medium">#}
+{#                        {{ form.pdf_url }}#}
+{#                        <br/> <span style="color:red;">Please Upload PDF file </span> #}
+{#                        {% if form.pdf_url.errors %}#}
+{#                            <label class='error'>{{form.pdf_url.errors.0}}</label>#}
+{#                        {% endif %}#}
+{#                    </div>#}
+{#                </div>#}
                 <div class="mws-form-row">
                     <label>Address</label>
 
@@ -112,6 +112,16 @@
                     </div>
                 </div>
                 <div class="mws-form-row">
+                    <label>Tel (Optional)</label>
+
+                    <div class="mws-form-item medium">
+                        {{ form.tel_opt}}
+                        {% if form.tel_opt.errors %}
+                            <label class='error'>{{form.tel_opt.errors.0}}</label>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="mws-form-row">
                     <label>Fax (Optional)</label>
 
                     <div class="mws-form-item medium">
@@ -121,7 +131,26 @@
                         {% endif %}
                     </div>
                 </div>
+                <div class="mws-form-row">
+                    <label>Open Time (Optional)</label>
 
+                    <div class="mws-form-item medium">
+                        {{ form.open_from}}
+                        {% if form.open_from.errors %}
+                            <label class='error'>{{form.open_from.errors.0}}</label>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="mws-form-row">
+                    <label>Close Time (Optional)</label>
+
+                    <div class="mws-form-item medium">
+                        {{ form.open_to}}
+                        {% if form.open_to.errors %}
+                            <label class='error'>{{form.open_to.errors.0}}</label>
+                        {% endif %}
+                    </div>
+                </div>
                 <div class="mws-form-row">
                     <label>Description</label>
 

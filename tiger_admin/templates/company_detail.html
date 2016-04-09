@@ -9,15 +9,15 @@
         <div class="mws-panel-toolbar top clearfix">
         	<ul>
         	    <li><a href="{% url 'company-list' %}" class="mws-ic-16 ic-arrow-left">Back</a></li>
-            	  <li><a href='{% url "company-update" object.pk %}' class="mws-ic-16 ic-pencil">Edit Info</a></li>
+                <li><a href='{% url "company-update" object.pk %}' class="mws-ic-16 ic-pencil">Edit Info</a></li>
                 {% if object.status %}
                     <li><a href='{% url "company-update-status" object.pk %}' class="mws-ic-16 ic-pencil">Deactivate</a></li>
                 {% else %}
-                    <li><a href='{% url "company-update-status" object.pk %}' class="mws-ic-16 ic-pencil">Release</a></li>
+                    <li><a href='{% url "company-update-status" object.pk %}' class="mws-ic-16 ic-accept">Release</a></li>
                 {% endif %}
                 <li><a href='{% url "company-product-list" object.pk %}' class="mws-ic-16 ic-chart-organisation">Product List</a></li>
                 <li><a href='{% url "company-message-list" object.pk %}' class="mws-ic-16 ic-view">Message List</a></li>
-
+                <li><a href='{% url "company-pdf-list" object.pk %}' class="mws-ic-16 ic-doc-pdf">PDF List</a></li>
             </ul>
         </div>
         <table class="mws-table" id="datatable">
@@ -48,10 +48,10 @@
                     <td>Youtube URL</td>
                     <td><a href={{youtube_url}}>{{youtube_url}}</a></td>
                 </tr>
-                <tr class="gradeX">
-                    <td>PDF</td>
-                    <td><a href={{pdf_url}}>{{pdf_url}}</a></td>
-                </tr>
+{#                <tr class="gradeX">#}
+{#                    <td>PDF</td>#}
+{#                    <td><a href={{pdf_url}}>{{pdf_url}}</a></td>#}
+{#                </tr>#}
                 <tr class="gradeX">
                     <td>Address</td>
                     <td>{{object.address}}</td>
@@ -62,13 +62,22 @@
                 </tr>
                 <tr class="gradeX">
                     <td>Tel</td>
-                    <td>{{object.tel}}</td>
+                    {% if object.tel_opt %}
+                        <td>{{object.tel}}, {{object.tel_opt}}</td>
+                    {% else %}
+                        <td>{{object.tel}}</td>
+                    {% endif %}
                 </tr>
                 <tr class="gradeX">
                     <td>Fax</td>
                     <td>{{object.fax}}</td>
                 </tr>
-
+                {% if object.open_from and object.open_to %}
+                <tr class="gradeX">
+                    <td>Opening Hours</td>
+                    <td>{{object.open_from}} to {{ object.open_to }}</td>
+                </tr>
+                {% endif %}
                 <tr class="gradeX">
                     <td>Create Date</td>
                     <td>{{object.create_time}}</td>
@@ -95,7 +104,6 @@
                     <td>Tag</td>
                     <td>{{tag}}</td>
                 </tr>
-
             </tbody>
         </table>
     </div>

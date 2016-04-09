@@ -26,7 +26,6 @@ class AccountPasswordResetForm(forms.ModelForm):
 
 
 class CompanyCreateForm(forms.ModelForm):
-    # description = forms.CharField(widget=forms.Textarea, required=False)
     tag = forms.ModelChoiceField(queryset=models.Tag.objects.all())
     video_url = forms.CharField(max_length=128)
     account = forms.ModelChoiceField(queryset=models.Account.objects.filter(status=models.Account.STATUS_ENABLE))
@@ -48,9 +47,12 @@ class CompanyCreateForm(forms.ModelForm):
         self.fields['email'].widget.attrs['placeholder'] = 'Please input the company email'
         self.fields['fax'].widget.attrs['placeholder'] = 'Please input the company fax'
         self.fields['fax'].required = False
-        self.fields['pdf_url'].required = False
+        # self.fields['pdf_url'].required = False
         self.fields['description'].required = False
         self.fields['logo_url'].required = False
+        self.fields['tel_opt'].required = False
+        self.fields['open_from'].required = False
+        self.fields['open_to'].required = False
 
     def clean_url(self):
         return self.cleaned_data['url'].lower()
@@ -81,12 +83,12 @@ class CompanyCreateForm(forms.ModelForm):
 
     class Meta:
         model = models.Company
-        fields = ['name', 'slogan', 'url', 'description', 'pdf_url', 'is_index',
-                  'address', 'tel', 'email', 'fax', 'account', 'dis_order', 'logo_url']
+        fields = ['name', 'slogan', 'url', 'description', 'is_index',
+                  'address', 'tel', 'email', 'fax', 'account', 'dis_order', 'logo_url','open_from',
+                  'open_to', 'tel_opt']
 
 
 class CompanyUpdateForm(forms.ModelForm):
-    # description = forms.CharField(widget=forms.Textarea, required=False)
     tag = forms.ModelChoiceField(queryset=models.Tag.objects.all())
     video_url = forms.CharField(max_length=128)
     account = forms.ModelChoiceField(queryset=models.Account.objects.filter(status=models.Account.STATUS_ENABLE))
@@ -95,12 +97,15 @@ class CompanyUpdateForm(forms.ModelForm):
         super(CompanyUpdateForm, self).__init__(*args, **kwargs)
         for field in self:
             field.field.widget.attrs['class'] = 'mws-textinput'
-        self.fields['pdf_url'].required = False
+        # self.fields['pdf_url'].required = False
         self.fields['logo_url'].required = False
         self.fields['slogan'].required = False
         self.fields['fax'].required = False
         self.fields['description'].required = False
         self.fields['dis_order'].required = False
+        self.fields['tel_opt'].required = False
+        self.fields['open_from'].required = False
+        self.fields['open_to'].required = False
 
     def clean_url(self):
         return self.cleaned_data['url'].lower()
@@ -128,8 +133,9 @@ class CompanyUpdateForm(forms.ModelForm):
 
     class Meta:
         model = models.Company
-        fields = ['name', 'slogan', 'url', 'description', 'pdf_url', 'is_index', 'address',
-                  'tel', 'email', 'fax', 'account', 'dis_order', 'logo_url']
+        fields = ['name', 'slogan', 'url', 'description', 'is_index', 'address',
+                  'tel', 'email', 'fax', 'account', 'dis_order', 'logo_url', 'open_from',
+                  'open_to', 'tel_opt']
 
 
 class CategoryCreateForm(forms.ModelForm):
@@ -167,3 +173,14 @@ class GalleryUploadForm(forms.ModelForm):
 
     def on_duplicate_error(self):
         self.errors['name'] = ErrorList(['Image Name is duplicated with existing images'])
+
+
+class PDFCreateForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(PDFCreateForm, self).__init__(*args, **kwargs)
+        for field in self:
+            field.field.widget.attrs['class'] = 'mws-textinput'
+
+    class Meta:
+        model = models.PDF
+        fields = ['name', 'url']

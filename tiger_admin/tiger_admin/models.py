@@ -3,6 +3,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import pre_save, post_delete
 from django.dispatch import receiver
+from django.utils.timezone import localtime, now
 
 
 class Account(models.Model):
@@ -44,7 +45,8 @@ def create_user_if_not_exist(sender, **kwargs):
         user.save()
 
     except User.DoesNotExist:
-        user = User.objects.create_user(username=instance.username, password=instance.password)
+        user = User.objects.create_user(username=instance.username, password=instance.password,
+                                        last_login=localtime(now()))
 
         # Add user info
         user.username = instance.username
@@ -73,7 +75,7 @@ class Company(models.Model):
     valid_to = models.DateTimeField()
     status = models.SmallIntegerField(choices=Account.STATUS_CHOICES, default=Account.STATUS_DISABLE)
     account = models.ForeignKey(Account, on_delete=models.PROTECT)
-    pdf_url = models.FileField(upload_to='pdf', max_length=64)
+    # pdf_url = models.FileField(upload_to='pdf', max_length=64)
     is_index = models.BooleanField(default=False)
     address = models.CharField(max_length=128)
     email = models.CharField(max_length=64)
@@ -81,6 +83,9 @@ class Company(models.Model):
     fax = models.CharField(max_length=20)
     dis_order = models.IntegerField(default=0)
     logo_url = models.FileField(upload_to='logo', max_length=64)
+    tel_opt = models.CharField(max_length=20, default='')
+    open_from = models.CharField(max_length=20, default='')
+    open_to = models.CharField(max_length=20, default='')
 
     class Meta:
         db_table = "company_tab"
@@ -197,3 +202,13 @@ class HotCompany(models.Model):
 
     class Meta:
         db_table = 'hot_company_tab'
+
+
+class PDF(models.Model):
+    company = models.ForeignKey(Company, on_delete=models.PROTECT)
+    name = models.CharField(max_length=64)
+    url = models.FileField(upload_to='pdf', max_length=128)
+    status = models.SmallIntegerField(choices=Account.STATUS_CHOICES, default=1)
+
+    class Meta:
+        db_table = 'pdf_tab'

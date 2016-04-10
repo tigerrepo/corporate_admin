@@ -397,15 +397,15 @@ class CompanyUpdateView(UpdateView):
                 obj = form.save()
 
                 if form.cleaned_data['logo_url'] is not None:
-                    if form.cleaned_data['logo_url'] != object.logo_url:
-                        directory = '%s%s' % (settings.LOGO_ROOT, object.id)
+                    if form.cleaned_data['logo_url'] != obj.logo_url:
+                        directory = '%s%s' % (settings.LOGO_ROOT, obj.id)
                         logo_url = upload_image(form.cleaned_data['logo_url'], directory)
-                        object.logo_url = logo_url
-                        object.save()
+                        obj.logo_url = logo_url
+                        obj.save()
 
                 try:
                     video = models.Video.objects.get(company=obj)
-                    if form.cleaned_data['video_url'] !=  video.video_url:
+                    if form.cleaned_data['video_url'] != video.video_url:
                         video_url = form.cleaned_data['video_url']
                         name = video_url.split("=")[-1]
                         models.Video.objects.filter(company=obj).update(

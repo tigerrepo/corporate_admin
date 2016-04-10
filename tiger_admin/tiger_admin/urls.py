@@ -68,11 +68,15 @@ def check_pdf_permission(func, view_name):
         kwargs['is_admin'] = account.account_type == models.Account.ACCOUNT_TYPE_ADMIN
         kwargs['account'] = account
         companies = list(c.id for c in models.Company.objects.filter(account=account))
+        print companies
+        print pk
         try:
-            kwargs['is_owner'] = models.PDF.objects.get(pk=pk, company_id__in=companies)
+            models.PDF.objects.get(pk=pk, company_id__in=companies)
+            kwargs['is_owner'] = True
         except models.PDF.DoesNotExist:
             kwargs['is_owner'] = False
         if kwargs['is_admin'] or kwargs['is_owner']:
+            print '123'
             logger.info("access user:%s, view:%s", request.user.username, view_name)
             return func(request, *args, **kwargs)
         return HttpResponseForbidden()
@@ -196,7 +200,7 @@ urlpatterns = patterns(
 
     # pdf
     url(r'^pdf/(?P<pk>\d+)/add/$',
-        check_pdf_permission(login_required(views.PDFCreateView.as_view()), 'pdf-add'),
+        check_corporate_permission(login_required(views.PDFCreateView.as_view()), 'pdf-add'),
         name='pdf-add'),
     url(r'^pdf/(?P<pk>\d+)/detail/$',
         check_pdf_permission(login_required(views.PDFDetailView.as_view()), 'pdf-detail'),

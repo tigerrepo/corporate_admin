@@ -149,10 +149,8 @@ class Product(models.Model):
     description = RichTextField()
     create_date = models.DateTimeField(auto_now_add=True)
     status = models.SmallIntegerField(choices=Account.STATUS_CHOICES, default=1)
-    # pdf_url = models.FileField(upload_to='pdf', max_length=64)
 
     class Meta:
-        unique_together = ('company', 'name')
         db_table = 'product_tab'
 
     def __unicode__(self):
@@ -166,7 +164,6 @@ class Gallery(models.Model):
     product = models.ForeignKey(Product, on_delete=models.PROTECT)
 
     class Meta:
-        unique_together = ('name', 'product')
         db_table = 'gallery_tab'
 
     def __unicode__(self):

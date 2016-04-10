@@ -102,8 +102,7 @@ def update_pdf_status(request, pk):
     account = models.Account.objects.get(username=request.user)
     companies = [obj for obj in models.Company.objects.filter(account=account)]
     pdf_ids = [obj.id for obj in models.PDF.objects.filter(company__in=companies)]
-
-    if pk in pdf_ids or account.account_type == models.Account.ACCOUNT_TYPE_ADMIN:
+    if int(pk) in pdf_ids or account.account_type == models.Account.ACCOUNT_TYPE_ADMIN:
         pdf = models.PDF.objects.get(pk=pk)
         pdf.status = not pdf.status
         pdf.save()
@@ -298,8 +297,6 @@ class CompanyCreateView(CreateView):
 
     def get_context_data(self, **kwargs):
         context = super(CompanyCreateView, self).get_context_data(**kwargs)
-        # account = models.Account.objects.get(username__exact=self.request.user.username)
-        # context['is_admin'] = account.account_type == models.Account.ACCOUNT_TYPE_ADMIN
         return context
 
     def form_valid(self, form):
@@ -307,17 +304,12 @@ class CompanyCreateView(CreateView):
             with transaction.atomic(using='tiger_admin'):
                 obj = form.save()
 
-                # if form.cleaned_data['pdf_url'] is not None:
-                #     directory = '%s%s' % (settings.PDF_ROOT, object.id)
-                #     pdf_url = upload_image(form.cleaned_data['pdf_url'], directory)
-                #     object.pdf_url = pdf_url
-                #
-                # if form.cleaned_data['logo_url'] is not None:
-                #     directory = '%s%s' % (settings.LOGO_ROOT, object.id)
-                #     logo_url = upload_image(form.cleaned_data['logo_url'], directory)
-                #     object.logo_url = logo_url
-                #
-                # object.save()
+                if form.cleaned_data['logo_url'] is not None:
+                    directory = '%s%s' % (settings.LOGO_ROOT, object.id)
+                    logo_url = upload_image(form.cleaned_data['logo_url'], directory)
+                    object.logo_url = logo_url
+
+                    object.save()
 
                 video_url = form.cleaned_data['video_url']
                 name = video_url.split("=")[-1]
@@ -357,8 +349,6 @@ class CompanyDetailView(DetailView):
             company_tag_dict[company_tag.company_id].append(company_tag.tag.name)
 
         context['tag'] = ','.join(company_tag_dict.get(self.object.pk, []))
-        # if self.get_object().pdf_url != "":
-        #     context['pdf_url'] = '%s%s/%s' % (settings.PDF_URL, self.get_object().id, self.get_object().pdf_url)
 
         if self.get_object().logo_url:
             context['logo_url'] = '%s%s/%s' % (settings.LOGO_URL, self.get_object().id, self.get_object().logo_url)
@@ -371,7 +361,6 @@ class CompanyDetailView(DetailView):
         except models.Video.DoesNotExist:
             context['youtube_url'] = ''
 
-        # context['is_admin'] = is_admin
         return context
 
 
@@ -404,7 +393,15 @@ class CompanyUpdateView(UpdateView):
                     form.instance.dis_order = self.object.dis_order
                 if not form.instance.dis_order:
                     form.instance.dis_order = 0
+
                 obj = form.save()
+
+                if form.cleaned_data['logo_url'] is not None:
+                    if form.cleaned_data['logo_url'] != object.logo_url:
+                        directory = '%s%s' % (settings.LOGO_ROOT, object.id)
+                        logo_url = upload_image(form.cleaned_data['logo_url'], directory)
+                        object.logo_url = logo_url
+                        object.save()
 
                 try:
                     video = models.Video.objects.get(company=obj)
@@ -574,9 +571,13 @@ class ProductCreateView(CreateView):
         return context
 
     def form_valid(self, form):
-        obj = form.save()
-        logger.info("Product %s has been created by %s", obj.name, self.request.user)
-        return HttpResponseRedirect(self.get_success_url())
+        try:
+            obj = form.save()
+            logger.info("Product %s has been created by %s", obj.name, self.request.user)
+            return HttpResponseRedirect(self.get_success_url())
+        except IntegrityError:
+            form.on_duplicate()
+            return self.form_invalid(form)
 
     def get_success_url(self):
         return reverse('product-list')
@@ -753,8 +754,12 @@ class PDFCreateView(CreateView):
 
     def form_valid(self, form):
         form.instance.company_id = self.kwargs['pk']
-        obj = form.save()
-        logger.info("PDF %s has been created by %s", obj.name, self.request.user)
+        if form.cleaned_data['url'] is not None:
+            directory = '%s%s' % (settings.PDF_ROOT, self.kwargs['pk'])
+            pdf_url = upload_image(form.cleaned_data['url'], directory)
+            form.instance.url = pdf_url
+            obj = form.save()
+            logger.info("PDF %s has been created by %s", obj.name, self.request.user)
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):
@@ -767,10 +772,7 @@ class PDFDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(PDFDetailView, self).get_context_data(**kwargs)
-        if self.object.url == '':
-            context['url'] = ''
-        else:
-            context['url'] = '%s%s/%s' % (settings.PDF_URL, self.object.id, self.object.url)
+        context['url'] = '%s%s/%s' % (settings.PDF_URL, self.object.company_id, self.object.url)
         return context
 
 
@@ -781,31 +783,20 @@ class PDFUpdateView(UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super(PDFUpdateView, self).get_context_data(**kwargs)
-        if self.object.url == '':
-            context['url'] = ''
-        else:
-            context['url'] = '%s%s/%s' % (settings.PDF_URL, self.object.id, self.object.url)
+        context['url'] = '%s%s/%s' % (settings.PDF_URL, self.object.company_id, self.object.url)
         return context
 
     def form_valid(self, form):
-        form.instance.company_id = self.kwargs['pk']
         obj = form.save()
-
         if form.cleaned_data['url'] is not None:
-            if form.cleaned_data['url'] != object.pdf_url:
-                directory = '%s%s' % (settings.PDF_ROOT, object.id)
+            if form.cleaned_data['url'] != obj.url:
+                directory = '%s%s' % (settings.PDF_ROOT, obj.id)
                 pdf_url = upload_image(form.cleaned_data['url'], directory)
-                object.pdf_url = pdf_url
-
-        if form.cleaned_data['url'] is not None:
-            if form.cleaned_data['url'] != object.logo_url:
-                directory = '%s%s' % (settings.LOGO_ROOT, object.id)
-                logo_url = upload_image(form.cleaned_data['url'], directory)
-                object.logo_url = logo_url
-        object.save()
+                obj.url = pdf_url
+                obj.save()
 
         logger.info("PDF %s has been created by %s", obj.name, self.request.user)
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):
-        return reverse('company-pdf-list', kwargs={'pk': self.kwargs['pk']})
+        return reverse('company-pdf-list', kwargs={'pk': self.object.company_id})

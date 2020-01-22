@@ -173,11 +173,15 @@ class Enquiry(models.Model):
     company = models.CharField(max_length=128)
     email = models.CharField(max_length=64)
     mobile = models.CharField(max_length=20)
-    REGION_TYPE_SG = 0
-    REGION_TYPE_CN = 1
+    REGION_TYPE_JU = 0
+    REGION_TYPE_CO = 1
+    REGION_TYPE_PAY = 2
+    REGION_TYPE_OT = 3
     REGION_TYPE_CHOICES = (
-        (REGION_TYPE_SG, u'Singapore'),
-        (REGION_TYPE_CN, u'China'),
+        (REGION_TYPE_JU, u'Join Us'),
+        (REGION_TYPE_CO, u'Collaboration Opportunities'),
+        (REGION_TYPE_PAY, u'Payment'),
+        (REGION_TYPE_OT, u'Others'),
     )
     region = models.SmallIntegerField(choices=REGION_TYPE_CHOICES, default=0)
     ip = models.CharField(max_length=64)

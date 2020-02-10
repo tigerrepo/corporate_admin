@@ -27,33 +27,29 @@ class AccountPasswordResetForm(forms.ModelForm):
 
 class CompanyCreateForm(forms.ModelForm):
     tag = forms.ModelChoiceField(queryset=models.Tag.objects.all())
-    video_url = forms.CharField(max_length=128)
+    # video_url = forms.CharField(max_length=128)
     account = forms.ModelChoiceField(queryset=models.Account.objects.filter(status=models.Account.STATUS_ENABLE))
 
     def __init__(self, *args, **kwargs):
         super(CompanyCreateForm, self).__init__(*args, **kwargs)
         for field in self:
             field.field.widget.attrs['class'] = 'mws-textinput'
-        self.fields['name'].widget.attrs['placeholder'] = 'Please input the company name'
-        self.fields['slogan'].widget.attrs['placeholder'] = 'Please input the company slogan'
-        self.fields['slogan'].required = False
-        self.fields['url'].widget.attrs['placeholder'] = \
-            'URL will be http://www.riceglobal.com/corporate/ntuc if you enter ntuc here'
-        self.fields['video_url'].widget.attrs['placeholder'] = 'Please input the youtube video url of the company'
-        self.fields['description'].widget.attrs['placeholder'] = 'Please input the company description'
-        self.fields['address'].widget.attrs['placeholder'] = 'Please input the company address'
-        self.fields['tel'].widget.attrs['placeholder'] = 'Please input the company telephone'
-        self.fields['email'].widget.attrs['placeholder'] = 'Please input the company email'
-        self.fields['fax'].widget.attrs['placeholder'] = 'Please input the company fax'
-        self.fields['fax'].required = False
-        self.fields['description'].required = False
-        self.fields['logo_url'].required = False
-        self.fields['tel_opt'].required = False
-        self.fields['open_from'].required = False
-        self.fields['open_to'].required = False
+        # self.fields['name'].widget.attrs['placeholder'] = 'Please input the company name'
+        # self.fields['slogan'].widget.attrs['placeholder'] = 'Please input the company slogan'
+        # self.fields['description'].widget.attrs['placeholder'] = 'Please input the company description'
+        # self.fields['address'].widget.attrs['placeholder'] = 'Please input the company address'
+        # self.fields['tel'].widget.attrs['placeholder'] = 'Please input the company telephone'
+        # self.fields['email'].widget.attrs['placeholder'] = 'Please input the company email'
+        # self.fields['fax'].widget.attrs['placeholder'] = 'Please input the company fax'
+        # self.fields['fax'].required = False
+        # self.fields['description'].required = False
+        # self.fields['logo_url'].required = False
+        # self.fields['tel_opt'].required = False
+        # self.fields['open_from'].required = False
+        # self.fields['open_to'].required = False
 
-    def clean_url(self):
-        return self.cleaned_data['url'].lower()
+    # def clean_url(self):
+    #     return self.cleaned_data['url'].lower()
 
     def clean_email(self):
         email = self.cleaned_data['email']
@@ -61,51 +57,50 @@ class CompanyCreateForm(forms.ModelForm):
             raise forms.ValidationError('Email is not valid')
         return email
 
-    def clean_tel(self):
-        tel = self.cleaned_data['tel']
+    # def clean_tel(self):
+    #     tel = self.cleaned_data['tel']
 
-        if not tel.isdecimal():
-            if '(' in tel or ')' in tel or '+' in tel or '_' in tel or '-' in tel:
-                return tel
-            else:
-                raise forms.ValidationError('Telephone number is invalid')
-        return tel
+    #     if not tel.isdecimal():
+    #         if '(' in tel or ')' in tel or '+' in tel or '_' in tel or '-' in tel:
+    #             return tel
+    #         else:
+    #             raise forms.ValidationError('Telephone number is invalid')
+    #     return tel
 
-    def clean_video_url(self):
-        url = str(self.cleaned_data['video_url'])
-        if not url.startswith("http://") and not url.startswith("https://") and '=' not in url:
-            raise forms.ValidationError('Video Url must be start with http:// or https:// and contain =')
-        if '=' not in url:
-            raise forms.ValidationError('Video Url must be youtube format and contain = ')
-        return url
+    # def clean_video_url(self):
+    #     url = str(self.cleaned_data['video_url'])
+    #     if not url.startswith("http://") and not url.startswith("https://") and '=' not in url:
+    #         raise forms.ValidationError('Video Url must be start with http:// or https:// and contain =')
+    #     if '=' not in url:
+    #         raise forms.ValidationError('Video Url must be youtube format and contain = ')
+    #     return url
 
     class Meta:
         model = models.Company
         fields = ['name', 'slogan', 'url', 'description', 'is_index',
-                  'address', 'tel', 'email', 'fax', 'account', 'dis_order', 'logo_url', 'open_from',
-                  'open_to', 'tel_opt']
+                  'address',  'email', 'account', 'dis_order', 'logo_url' ]
 
 
 class CompanyUpdateForm(forms.ModelForm):
     tag = forms.ModelChoiceField(queryset=models.Tag.objects.all())
-    video_url = forms.CharField(max_length=128)
+    # video_url = forms.CharField(max_length=128)
     account = forms.ModelChoiceField(queryset=models.Account.objects.filter(status=models.Account.STATUS_ENABLE))
 
     def __init__(self, *args, **kwargs):
         super(CompanyUpdateForm, self).__init__(*args, **kwargs)
         for field in self:
             field.field.widget.attrs['class'] = 'mws-textinput'
-        self.fields['logo_url'].required = False
-        self.fields['slogan'].required = False
-        self.fields['fax'].required = False
-        self.fields['description'].required = False
-        self.fields['dis_order'].required = False
-        self.fields['tel_opt'].required = False
-        self.fields['open_from'].required = False
-        self.fields['open_to'].required = False
+        # self.fields['logo_url'].required = False
+        # self.fields['slogan'].required = False
+        # self.fields['fax'].required = False
+        # self.fields['description'].required = False
+        # self.fields['dis_order'].required = False
+        # self.fields['tel_opt'].required = False
+        # self.fields['open_from'].required = False
+        # self.fields['open_to'].required = False
 
-    def clean_url(self):
-        return self.cleaned_data['url'].lower()
+    # def clean_url(self):
+        # return self.cleaned_data['url'].lower()
 
     def clean_email(self):
         email = self.cleaned_data['email']
@@ -113,26 +108,25 @@ class CompanyUpdateForm(forms.ModelForm):
             raise forms.ValidationError('Email is not valid')
         return email
 
-    def clean_tel(self):
-        tel = self.cleaned_data['tel']
-        if not tel.isdecimal():
-            if '(' in tel or ')' in tel or '+' in tel or '_' in tel or '-' in tel:
-                return tel
-            else:
-                raise forms.ValidationError('Telephone number is invalid')
-        return tel
+    # def clean_tel(self):
+    #     tel = self.cleaned_data['tel']
+    #     if not tel.isdecimal():
+    #         if '(' in tel or ')' in tel or '+' in tel or '_' in tel or '-' in tel:
+    #             return tel
+    #         else:
+    #             raise forms.ValidationError('Telephone number is invalid')
+    #     return tel
 
-    def clean_video_url(self):
-        url = str(self.cleaned_data['video_url'])
-        if not url.startswith("http://") and not url.startswith("https://"):
-            raise forms.ValidationError('Video Url must be start with http:// or https://')
-        return url
+    # def clean_video_url(self):
+    #     url = str(self.cleaned_data['video_url'])
+    #     if not url.startswith("http://") and not url.startswith("https://"):
+    #         raise forms.ValidationError('Video Url must be start with http:// or https://')
+    #     return url
 
     class Meta:
         model = models.Company
         fields = ['name', 'slogan', 'url', 'description', 'is_index', 'address',
-                  'tel', 'email', 'fax', 'account', 'dis_order', 'logo_url', 'open_from',
-                  'open_to', 'tel_opt']
+                  'email', 'account', 'dis_order', 'logo_url']
 
 
 class CategoryCreateForm(forms.ModelForm):

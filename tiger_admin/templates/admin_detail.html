@@ -20,7 +20,7 @@
                 <li><a href='{% url "admin-change-password" object.pk %}' class="mws-ic-16 ic-change-password">Change Password</a></li>
               {% endif %}
               {% if object.account_type == 1 %}
-              <li><a href='{% url "admin-company-list" object.pk %}' class="mws-ic-16 ic-group">Company List</a></li>
+              <li><a href='{% url "admin-company-list" object.pk %}' class="mws-ic-16 ic-group">Individual List</a></li>
               {% endif %}
             </ul>
         </div>

@@ -371,7 +371,7 @@ class CompanyUpdateView(UpdateView):
 
     def get_initial(self):
 
-        video = get_object_or_404(models.Video, company=self.object)
+        # video = get_object_or_404(models.Video, company=self.object)
         try:
             tag = models.CompanyTag.objects.get(company=self.object)
             tag_val = tag.tag_id

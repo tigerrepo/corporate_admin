@@ -37,47 +37,22 @@
                 </tr>
                 {% endif %}
                 <tr class="gradeX">
-                    <td>Slogan</td>
+                    <td>Career Title</td>
                     <td>{{object.slogan}}</td>
                 </tr>
                 <tr class="gradeX">
-                    <td>URL</td>
-                    <td><a href="{{ domain }}{{ object.url }}">{{object.url}}</a></td>
+                    <td>Personal Statement</td>
+                    <td>{{object.url}}</a></td>
                 </tr>
                 <tr class="gradeX">
-                    <td>Youtube URL</td>
-                    <td><a href={{youtube_url}}>{{youtube_url}}</a></td>
-                </tr>
-{#                <tr class="gradeX">#}
-{#                    <td>PDF</td>#}
-{#                    <td><a href={{pdf_url}}>{{pdf_url}}</a></td>#}
-{#                </tr>#}
-                <tr class="gradeX">
-                    <td>Address</td>
+                    <td>Career Capabilities</td>
                     <td>{{object.address}}</td>
                 </tr>
                 <tr class="gradeX">
                     <td>Email</td>
                     <td>{{object.email}}</td>
                 </tr>
-                <tr class="gradeX">
-                    <td>Tel</td>
-                    {% if object.tel_opt %}
-                        <td>{{object.tel}}, {{object.tel_opt}}</td>
-                    {% else %}
-                        <td>{{object.tel}}</td>
-                    {% endif %}
-                </tr>
-                <tr class="gradeX">
-                    <td>Fax</td>
-                    <td>{{object.fax}}</td>
-                </tr>
-                {% if object.open_from and object.open_to %}
-                <tr class="gradeX">
-                    <td>Opening Hours</td>
-                    <td>{{object.open_from}} to {{ object.open_to }}</td>
-                </tr>
-                {% endif %}
+                
                 <tr class="gradeX">
                     <td>Create Date</td>
                     <td>{{object.create_time}}</td>

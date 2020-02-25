@@ -1,6 +1,8 @@
 from django import forms
 from django.forms.utils import ErrorList
 import models
+from ckeditor.widgets import CKEditorWidget
+
 
 
 class AccountPasswordResetForm(forms.ModelForm):
@@ -27,8 +29,13 @@ class AccountPasswordResetForm(forms.ModelForm):
 
 class CompanyCreateForm(forms.ModelForm):
     tag = forms.ModelChoiceField(queryset=models.Tag.objects.all())
-    # video_url = forms.CharField(max_length=128)
     account = forms.ModelChoiceField(queryset=models.Account.objects.filter(status=models.Account.STATUS_ENABLE))
+    slogan = forms.CharField(required=False)
+    url = forms.CharField(required=False)
+    address = forms.CharField(required=False)
+    logo_url = forms.FileField(required=False)
+    email = forms.CharField(required=False)
+    description = forms.CharField(widget=CKEditorWidget(), required=False)
 
     def __init__(self, *args, **kwargs):
         super(CompanyCreateForm, self).__init__(*args, **kwargs)
@@ -53,28 +60,12 @@ class CompanyCreateForm(forms.ModelForm):
 
     def clean_email(self):
         email = self.cleaned_data['email']
+        if email == '':
+            return email
+
         if "@" not in email or '.' not in email:
             raise forms.ValidationError('Email is not valid')
         return email
-
-    # def clean_tel(self):
-    #     tel = self.cleaned_data['tel']
-
-    #     if not tel.isdecimal():
-    #         if '(' in tel or ')' in tel or '+' in tel or '_' in tel or '-' in tel:
-    #             return tel
-    #         else:
-    #             raise forms.ValidationError('Telephone number is invalid')
-    #     return tel
-
-    # def clean_video_url(self):
-    #     url = str(self.cleaned_data['video_url'])
-    #     if not url.startswith("http://") and not url.startswith("https://") and '=' not in url:
-    #         raise forms.ValidationError('Video Url must be start with http:// or https:// and contain =')
-    #     if '=' not in url:
-    #         raise forms.ValidationError('Video Url must be youtube format and contain = ')
-    #     return url
-
     class Meta:
         model = models.Company
         fields = ['name', 'slogan', 'url', 'description', 'is_index',
@@ -83,46 +74,27 @@ class CompanyCreateForm(forms.ModelForm):
 
 class CompanyUpdateForm(forms.ModelForm):
     tag = forms.ModelChoiceField(queryset=models.Tag.objects.all())
-    # video_url = forms.CharField(max_length=128)
     account = forms.ModelChoiceField(queryset=models.Account.objects.filter(status=models.Account.STATUS_ENABLE))
+    slogan = forms.CharField(required=False)
+    url = forms.CharField(required=False)
+    address = forms.CharField(required=False)
+    logo_url = forms.FileField(required=False)
+    email = forms.CharField(required=False)
+    description = forms.CharField(widget=CKEditorWidget(), required=False)
 
     def __init__(self, *args, **kwargs):
         super(CompanyUpdateForm, self).__init__(*args, **kwargs)
         for field in self:
             field.field.widget.attrs['class'] = 'mws-textinput'
-        # self.fields['logo_url'].required = False
-        # self.fields['slogan'].required = False
-        # self.fields['fax'].required = False
-        # self.fields['description'].required = False
-        # self.fields['dis_order'].required = False
-        # self.fields['tel_opt'].required = False
-        # self.fields['open_from'].required = False
-        # self.fields['open_to'].required = False
-
-    # def clean_url(self):
-        # return self.cleaned_data['url'].lower()
-
+       
     def clean_email(self):
         email = self.cleaned_data['email']
+        if email == '':
+            return email
+
         if "@" not in email or '.' not in email:
             raise forms.ValidationError('Email is not valid')
         return email
-
-    # def clean_tel(self):
-    #     tel = self.cleaned_data['tel']
-    #     if not tel.isdecimal():
-    #         if '(' in tel or ')' in tel or '+' in tel or '_' in tel or '-' in tel:
-    #             return tel
-    #         else:
-    #             raise forms.ValidationError('Telephone number is invalid')
-    #     return tel
-
-    # def clean_video_url(self):
-    #     url = str(self.cleaned_data['video_url'])
-    #     if not url.startswith("http://") and not url.startswith("https://"):
-    #         raise forms.ValidationError('Video Url must be start with http:// or https://')
-    #     return url
-
     class Meta:
         model = models.Company
         fields = ['name', 'slogan', 'url', 'description', 'is_index', 'address',

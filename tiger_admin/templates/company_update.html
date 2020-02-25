@@ -34,7 +34,6 @@
                     <label>Display photo</label>
                     <div class="mws-form-item medium">
                         {{ form.logo_url }}
-                        <br/> <span style="color:red;">Please Upload Logo image </span>
                         {% if form.logo_url.errors %}
                             <label class='error'>{{form.logo_url.errors.0}}</label>
                         {% endif %}

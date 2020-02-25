@@ -305,20 +305,20 @@ class CompanyCreateView(CreateView):
                 obj = form.save()
 
                 if form.cleaned_data['logo_url'] is not None:
-                    directory = '%s%s' % (settings.LOGO_ROOT, object.id)
+                    directory = '%s%s' % (settings.LOGO_ROOT, obj.id)
                     logo_url = upload_image(form.cleaned_data['logo_url'], directory)
-                    object.logo_url = logo_url
+                    obj.logo_url = logo_url
 
-                    object.save()
+                    obj.save()
 
-                video_url = form.cleaned_data['video_url']
-                name = video_url.split("=")[-1]
-                models.Video.objects.create(
-                    name=name,
-                    description='',
-                    video_url=video_url,
-                    host_url='%s/%s.mp4' % (obj.id, obj.id),
-                    company=obj)
+                # video_url = form.cleaned_data['video_url']
+                # name = video_url.split("=")[-1]
+                # models.Video.objects.create(
+                #     name=name,
+                #     description='',
+                #     video_url=video_url,
+                #     host_url='%s/%s.mp4' % (obj.id, obj.id),
+                #     company=obj)
 
                 tag = form.cleaned_data['tag']
                 models.CompanyTag.objects.get_or_create(company=obj, tag=tag)
@@ -378,7 +378,7 @@ class CompanyUpdateView(UpdateView):
         except Exception as e:
             tag_val = 0
         initials = dict()
-        initials['video_url'] = video.video_url
+        # initials['video_url'] = video.video_url
         initials['tag'] = tag_val
         return initials
 
@@ -403,28 +403,29 @@ class CompanyUpdateView(UpdateView):
                         obj.logo_url = logo_url
                         obj.save()
 
-                try:
-                    video = models.Video.objects.get(company=obj)
-                    if form.cleaned_data['video_url'] != video.video_url:
-                        video_url = form.cleaned_data['video_url']
-                        name = video_url.split("=")[-1]
-                        models.Video.objects.filter(company=obj).update(
-                                name=name,
-                                description='',
-                                video_url=video_url,
-                                host_url='%s/%s.mp4' % (obj.id, obj.id))
-                except models.Video.DoesNotExist:
-                        video_url = form.cleaned_data['video_url']
-                        name = video_url.split("=")[-1]
-                        models.Video.objects.filter(company=obj).update(
-                                name=name,
-                                description='',
-                                video_url=video_url,
-                                host_url='%s/%s.mp4' % (obj.id, obj.id))
+                # try:
+                #     video = models.Video.objects.get(company=obj)
+                #     if form.cleaned_data['video_url'] != video.video_url:
+                #         video_url = form.cleaned_data['video_url']
+                #         name = video_url.split("=")[-1]
+                #         models.Video.objects.filter(company=obj).update(
+                #                 name=name,
+                #                 description='',
+                #                 video_url=video_url,
+                #                 host_url='%s/%s.mp4' % (obj.id, obj.id))
+                # except models.Video.DoesNotExist:
+                #         video_url = form.cleaned_data['video_url']
+                #         name = video_url.split("=")[-1]
+                #         models.Video.objects.filter(company=obj).update(
+                #                 name=name,
+                #                 description='',
+                #                 video_url=video_url,
+                #                 host_url='%s/%s.mp4' % (obj.id, obj.id))
 
                 tag = form.cleaned_data['tag']
                 models.CompanyTag.objects.filter(company=obj).update(tag=tag)
         except Exception as e:
+            print e
             logger.error("update Website fail, roll back, website %s, operate by %s. Exception: %s",
                          form.cleaned_data['name'], self.request.user, str(e))
             # add error in page

@@ -4,7 +4,7 @@
 <div class="mws-panel grid_6">
     <div class="mws-panel-header">
       {% if can_add %}
-        <span class="mws-i-24 i-pencil">Create Product</span>
+        <span class="mws-i-24 i-pencil">Create Content</span>
       {% endif %}
     </div>
     <div class="mws-panel-body">
@@ -13,7 +13,7 @@
             <div id="mws-validate-error" class="mws-form-message error" style="display:none;"></div>
             <div class="mws-form-inline">
                 <div class="mws-form-row">
-                    <label>Name</label>
+                    <label>Content Title</label>
 
                     <div class="mws-form-item medium">
                         {{ form.name }}
@@ -23,7 +23,7 @@
                     </div>
                 </div>
                 <div class="mws-form-row">
-                    <label>Company</label>
+                    <label>Name of Flinter</label>
 
                     <div class="mws-form-item medium" style="margin-top:8px;">
                         {{ form.company }}
@@ -33,7 +33,7 @@
                     </div>
                 </div>
                 <div class="mws-form-row">
-                    <label>Description</label>
+                    <label>Content Post</label>
 
                     <div class="mws-form-item medium">
                         {{ form.description }}

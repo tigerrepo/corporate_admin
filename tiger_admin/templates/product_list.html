@@ -4,21 +4,21 @@
 {% block content %}
 <div class="mws-panel grid_8">
     <div class="mws-panel-header">
-        <span class="mws-i-24 i-table-1">Product List</span>
+        <span class="mws-i-24 i-table-1">Content List</span>
     </div>
     <div class="mws-panel-body">
         {% if can_add %}
         <div class="mws-panel-toolbar top clearfix">
             <ul>
-              <li><a href='{% url "product-add" %}' class="mws-ic-16 ic-add">Create Product</a></li>
+              <li><a href='{% url "product-add" %}' class="mws-ic-16 ic-add">Create Content</a></li>
             </ul>
         </div>
         {% endif %}
         <table class="mws-datatable-fn mws-table" id="datatable">
             <thead>
                 <tr>
-                    <th>Name</th>
-                    <th>Company</th>
+                    <th>Title</th>
+                    <th>Name of Flinter</th>
                     <th>Create Date</th>
                     <th>Status</th>
                     <th>Detail</th>

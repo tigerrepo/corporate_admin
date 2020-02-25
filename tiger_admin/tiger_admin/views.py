@@ -355,11 +355,11 @@ class CompanyDetailView(DetailView):
         else:
             context['logo_url'] = ''
 
-        try:
-            video = models.Video.objects.get(company=self.get_object())
-            context['youtube_url'] = "%s%s" % (settings.YOUTUBE_URL_PREFIX, video.name)
-        except models.Video.DoesNotExist:
-            context['youtube_url'] = ''
+        # try:
+        #     video = models.Video.objects.get(company=self.get_object())
+        #     context['youtube_url'] = "%s%s" % (settings.YOUTUBE_URL_PREFIX, video.name)
+        # except models.Video.DoesNotExist:
+        #     context['youtube_url'] = ''
 
         return context
 

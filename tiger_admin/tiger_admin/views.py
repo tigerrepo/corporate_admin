@@ -649,6 +649,8 @@ class ProductImageListView(ListView):
         context['gallery_list'] = models.Gallery.objects.filter(product_id=pk)
         context['product'] = pk
         context['url_prefix'] = settings.IMAGE_URL_PREFIX
+        context['is_admin'] = self.kwargs['is_admin']
+        print self.kwargs['is_admin']
         return context
 
 

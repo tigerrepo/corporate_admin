@@ -7,7 +7,7 @@
         <span class="mws-i-24 i-table-1">Product Image List</span>
     </div>
     <div class="mws-panel-body">
-        {% if not is_admin %}
+        {% if  is_admin %}
         <div class="mws-panel-toolbar top clearfix">
             <ul>
                 <li><a href='{% url "product-detail" product %}' class="mws-ic-16 ic-arrow-left">Back</a></li>
@@ -20,7 +20,7 @@
                 <tr>
                     <th>Name</th>
                     <th>Image</th>
-                    <th>Cover</th>
+                    <!-- <th>Cover</th> -->
                     <th>Detail</th>
                 </tr>
             </thead>
@@ -29,7 +29,7 @@
                 <tr class="gradeX">
                     <td>{{ c.name }}</td>
                     <td><img src="{{ url_prefix }}{{product}}/{{ c.image_url }}" height="50"></td>
-                    <td>{{ c.is_cover }}</td>
+                    <!-- <td>{{ c.is_cover }}</td> -->
                     <td><a href='{% url "gallery-detail" product c.pk %}'><img src="{% static 'css/icons/16/view.png' %}" alt="Detail" width="24" height="24" border="0"></a></td>
                 </tr>
  

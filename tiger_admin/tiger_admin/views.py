@@ -175,15 +175,24 @@ def admin_add(request):
         u.save()
         logger.info("Account %s, %s, %s has been created by %s", username, password, account_type, request.user)
         if settings.SENT_EMAIL:
-            msg_txt = 'Your email is generated, please use %s as password to login. ' \
-                      'For your safety, please change your password once you login the system' % password
+            msg_txt = """ Welcome to Flinter! \r\n 
+                      Your profile is generated, please use the email add which you
+                        have received this email from as your Username and %s
+                        as password to login. For your safety, please change your
+                        password once you login the system.
+                      See you in the community, new Flinter!
+
+                      Best regards, 
+
+                      Flinter Team
+                      """ 
 
             msg = string.join((
                 "From: %s" % settings.EMAIL_HOST_USER,
                 "To: %s" % u.email,
                 "Subject: Notification" ,
                 "",
-                msg_txt
+                msg_txt % password
                 ), "\r\n")
 
             send_mail('Notification', msg, settings.EMAIL_HOST_USER, [u.email], fail_silently=False)

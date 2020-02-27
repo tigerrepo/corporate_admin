@@ -158,7 +158,7 @@ class Product(models.Model):
 class Gallery(models.Model):
     name = models.CharField(max_length=64)
     image_url = models.ImageField(upload_to='gallery/%Y%m%d', max_length=64)
-    is_cover = models.BooleanField(default=False)
+    is_cover = models.BooleanField(default=True)
     product = models.ForeignKey(Product, on_delete=models.PROTECT)
 
     class Meta:

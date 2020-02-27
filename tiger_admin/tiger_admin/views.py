@@ -681,8 +681,6 @@ class GalleryCreateView(CreateView):
         try:
             pk = self.kwargs.get('pk', 0)
             product = get_object_or_404(models.Product, pk=pk)
-            if form.cleaned_data['is_cover']:
-                models.Gallery.objects.filter(product_id=pk).update(is_cover=False)
             directory = '%s%s' % (settings.MEDIA_ROOT, pk)
             image_url = upload_image(form.cleaned_data['image_url'], directory)
             form.instance.image_url = image_url

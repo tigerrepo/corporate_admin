@@ -433,7 +433,6 @@ class CompanyUpdateView(UpdateView):
                 tag = form.cleaned_data['tag']
                 models.CompanyTag.objects.filter(company=obj).update(tag=tag)
         except Exception as e:
-            print e
             logger.error("update Website fail, roll back, website %s, operate by %s. Exception: %s",
                          form.cleaned_data['name'], self.request.user, str(e))
             # add error in page
@@ -658,7 +657,6 @@ class ProductImageListView(ListView):
         context['product'] = pk
         context['url_prefix'] = settings.IMAGE_URL_PREFIX
         context['is_admin'] = self.kwargs['is_admin']
-        print self.kwargs['is_admin']
         return context
 
 
@@ -727,8 +725,6 @@ class GalleryUpdateView(UpdateView):
     def form_valid(self, form):
         try:
             pk = self.kwargs.get('ppk', 0)
-            if form.cleaned_data['is_cover']:
-                models.Gallery.objects.filter(product_id=pk).update(is_cover=False)
 
             if form.cleaned_data['image_url'] is not None:
                 if form.cleaned_data['image_url'] != self.get_object().image_url:

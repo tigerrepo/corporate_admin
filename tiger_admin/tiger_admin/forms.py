@@ -134,7 +134,7 @@ class GalleryUploadForm(forms.ModelForm):
 
     class Meta:
         model = models.Gallery
-        fields = ['image_url', 'name', 'is_cover']
+        fields = ['image_url', 'name']
 
     def on_duplicate_error(self):
         self.errors['name'] = ErrorList(['Image Name is duplicated with existing images'])

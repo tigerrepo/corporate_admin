@@ -433,12 +433,12 @@ class CompanyUpdateView(UpdateView):
                 tag = form.cleaned_data['tag']
                 models.CompanyTag.objects.filter(company=obj).update(tag=tag)
         except Exception as e:
-            logger.error("update Website fail, roll back, website %s, operate by %s. Exception: %s",
+            logger.error("update Content fail, roll back, website %s, operate by %s. Exception: %s",
                          form.cleaned_data['name'], self.request.user, str(e))
             # add error in page
             return super(CompanyUpdateView, self).form_invalid(form)
 
-        logger.info("Website %s has been updated by %s", form.cleaned_data['name'], self.request.user)
+        logger.info("Content %s has been updated by %s", form.cleaned_data['name'], self.request.user)
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):

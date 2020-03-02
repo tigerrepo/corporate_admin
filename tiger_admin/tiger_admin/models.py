@@ -67,7 +67,7 @@ def delete_user(sender, instance=None, **kwargs):
 class Company(models.Model):
     name = models.CharField(max_length=255, unique=True)
     slogan = models.CharField(max_length=128)
-    url = models.CharField(max_length=64, unique=True)
+    url = models.CharField(max_length=100, unique=True)
     description = RichTextField()
     create_time = models.DateTimeField(auto_now_add=True)
     valid_from = models.DateTimeField()

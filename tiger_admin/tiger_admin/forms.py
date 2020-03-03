@@ -41,22 +41,6 @@ class CompanyCreateForm(forms.ModelForm):
         super(CompanyCreateForm, self).__init__(*args, **kwargs)
         for field in self:
             field.field.widget.attrs['class'] = 'mws-textinput'
-        # self.fields['name'].widget.attrs['placeholder'] = 'Please input the company name'
-        # self.fields['slogan'].widget.attrs['placeholder'] = 'Please input the company slogan'
-        # self.fields['description'].widget.attrs['placeholder'] = 'Please input the company description'
-        # self.fields['address'].widget.attrs['placeholder'] = 'Please input the company address'
-        # self.fields['tel'].widget.attrs['placeholder'] = 'Please input the company telephone'
-        # self.fields['email'].widget.attrs['placeholder'] = 'Please input the company email'
-        # self.fields['fax'].widget.attrs['placeholder'] = 'Please input the company fax'
-        # self.fields['fax'].required = False
-        # self.fields['description'].required = False
-        # self.fields['logo_url'].required = False
-        # self.fields['tel_opt'].required = False
-        # self.fields['open_from'].required = False
-        # self.fields['open_to'].required = False
-
-    # def clean_url(self):
-    #     return self.cleaned_data['url'].lower()
 
     def clean_email(self):
         email = self.cleaned_data['email']
@@ -98,7 +82,7 @@ class CompanyUpdateForm(forms.ModelForm):
     class Meta:
         model = models.Company
         fields = ['name', 'slogan', 'url', 'description', 'is_index', 'address',
-                  'email', 'account', 'dis_order', 'logo_url']
+                  'email', 'account', 'logo_url']
 
 
 class CategoryCreateForm(forms.ModelForm):

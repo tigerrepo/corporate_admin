@@ -378,7 +378,6 @@ class CompanyUpdateView(UpdateView):
     template_name = 'company_update.html'
 
     def get_initial(self):
-
         # video = get_object_or_404(models.Video, company=self.object)
         try:
             tag = models.CompanyTag.objects.get(company=self.object)
@@ -388,6 +387,7 @@ class CompanyUpdateView(UpdateView):
         initials = dict()
         # initials['video_url'] = video.video_url
         initials['tag'] = tag_val
+
         return initials
 
     def get_context_data(self, **kwargs):
@@ -397,7 +397,7 @@ class CompanyUpdateView(UpdateView):
     def form_valid(self, form):
         try:
             with transaction.atomic(using='tiger_admin'):
-                if form.cleaned_data['dis_order'] is None:
+                if 'dis_order' not in form.cleaned_data or form.cleaned_data['dis_order'] is None:
                     form.instance.dis_order = self.object.dis_order
                 if not form.instance.dis_order:
                     form.instance.dis_order = 0
@@ -411,24 +411,6 @@ class CompanyUpdateView(UpdateView):
                         obj.logo_url = logo_url
                         obj.save()
 
-                # try:
-                #     video = models.Video.objects.get(company=obj)
-                #     if form.cleaned_data['video_url'] != video.video_url:
-                #         video_url = form.cleaned_data['video_url']
-                #         name = video_url.split("=")[-1]
-                #         models.Video.objects.filter(company=obj).update(
-                #                 name=name,
-                #                 description='',
-                #                 video_url=video_url,
-                #                 host_url='%s/%s.mp4' % (obj.id, obj.id))
-                # except models.Video.DoesNotExist:
-                #         video_url = form.cleaned_data['video_url']
-                #         name = video_url.split("=")[-1]
-                #         models.Video.objects.filter(company=obj).update(
-                #                 name=name,
-                #                 description='',
-                #                 video_url=video_url,
-                #                 host_url='%s/%s.mp4' % (obj.id, obj.id))
 
                 tag = form.cleaned_data['tag']
                 models.CompanyTag.objects.filter(company=obj).update(tag=tag)

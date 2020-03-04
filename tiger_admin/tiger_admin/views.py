@@ -129,8 +129,7 @@ def password_reset(request, pk):
     logger.info("Account %s has been reset password %s, done by %s",
                 account.username, password, request.user)
     if settings.SENT_EMAIL:
-        msg_txt = 'Your password is reset to %s, please login and change your password.' % password
-
+        msg_txt = 'Your password is reset to %s, please login with %s as your Username and change your password' % (account.username , password)
         msg = string.join((
             "From: %s" % settings.EMAIL_HOST_USER,
             "To: %s" % account.email,

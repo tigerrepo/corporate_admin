@@ -50,7 +50,6 @@ def admin_list(request):
             users.append(account)
     else:
         users = [account]
-
     return render_to_response(
         'admins.html',
         {
@@ -637,7 +636,7 @@ class ProductImageListView(ListView):
         context['gallery_list'] = models.Gallery.objects.filter(product_id=pk)
         context['product'] = pk
         context['url_prefix'] = settings.IMAGE_URL_PREFIX
-        context['is_admin'] = self.kwargs['is_admin']
+        context['can_add'] = self.kwargs['is_admin'] or self.kwargs['is_owner']
         return context
 
 

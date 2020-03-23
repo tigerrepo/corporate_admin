@@ -166,9 +166,9 @@ SENT_EMAIL = False
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'stingray.websitewelcome.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'admin@flinter.com.sg'
-EMAIL_HOST_PASSWORD = 'Welcome2015'
-DEFAULT_FROM_EMAIL = 'admin@flinter.com.sg'
+EMAIL_HOST_USER = 'questions@flinter.app'
+EMAIL_HOST_PASSWORD = 'HappyW0rking!'
+DEFAULT_FROM_EMAIL = 'questions@flinter.app'
 DEFAULT_TO_EMAIL = 'miracleluchen@gmail.com'
 
 IMAGE_URL_PREFIX = 'http://cdn.riceglobal.com/gallery/'

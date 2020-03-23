@@ -50,7 +50,6 @@ def admin_list(request):
             users.append(account)
     else:
         users = [account]
-
     return render_to_response(
         'admins.html',
         {
@@ -129,8 +128,7 @@ def password_reset(request, pk):
     logger.info("Account %s has been reset password %s, done by %s",
                 account.username, password, request.user)
     if settings.SENT_EMAIL:
-        msg_txt = 'Your password is reset to %s, please login and change your password.' % password
-
+        msg_txt = 'Your password is reset to %s, please login with %s as your Username and change your password' % (password, account.username)
         msg = string.join((
             "From: %s" % settings.EMAIL_HOST_USER,
             "To: %s" % account.email,
@@ -378,7 +376,6 @@ class CompanyUpdateView(UpdateView):
     template_name = 'company_update.html'
 
     def get_initial(self):
-
         # video = get_object_or_404(models.Video, company=self.object)
         try:
             tag = models.CompanyTag.objects.get(company=self.object)
@@ -388,6 +385,7 @@ class CompanyUpdateView(UpdateView):
         initials = dict()
         # initials['video_url'] = video.video_url
         initials['tag'] = tag_val
+
         return initials
 
     def get_context_data(self, **kwargs):
@@ -397,7 +395,7 @@ class CompanyUpdateView(UpdateView):
     def form_valid(self, form):
         try:
             with transaction.atomic(using='tiger_admin'):
-                if form.cleaned_data['dis_order'] is None:
+                if 'dis_order' not in form.cleaned_data or form.cleaned_data['dis_order'] is None:
                     form.instance.dis_order = self.object.dis_order
                 if not form.instance.dis_order:
                     form.instance.dis_order = 0
@@ -411,24 +409,6 @@ class CompanyUpdateView(UpdateView):
                         obj.logo_url = logo_url
                         obj.save()
 
-                # try:
-                #     video = models.Video.objects.get(company=obj)
-                #     if form.cleaned_data['video_url'] != video.video_url:
-                #         video_url = form.cleaned_data['video_url']
-                #         name = video_url.split("=")[-1]
-                #         models.Video.objects.filter(company=obj).update(
-                #                 name=name,
-                #                 description='',
-                #                 video_url=video_url,
-                #                 host_url='%s/%s.mp4' % (obj.id, obj.id))
-                # except models.Video.DoesNotExist:
-                #         video_url = form.cleaned_data['video_url']
-                #         name = video_url.split("=")[-1]
-                #         models.Video.objects.filter(company=obj).update(
-                #                 name=name,
-                #                 description='',
-                #                 video_url=video_url,
-                #                 host_url='%s/%s.mp4' % (obj.id, obj.id))
 
                 tag = form.cleaned_data['tag']
                 models.CompanyTag.objects.filter(company=obj).update(tag=tag)
@@ -656,7 +636,7 @@ class ProductImageListView(ListView):
         context['gallery_list'] = models.Gallery.objects.filter(product_id=pk)
         context['product'] = pk
         context['url_prefix'] = settings.IMAGE_URL_PREFIX
-        context['is_admin'] = self.kwargs['is_admin']
+        context['can_add'] = self.kwargs['is_admin'] or self.kwargs['is_owner']
         return context
 
 

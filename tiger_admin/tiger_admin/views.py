@@ -726,6 +726,7 @@ class GalleryUpdateView(UpdateView):
 class EnquiresListView(ListView):
     model = models.Enquiry
     template_name = 'enqury_list.html'
+    ordering = ['-id']
 
 
 class PDFCreateView(CreateView):

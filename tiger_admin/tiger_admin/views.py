@@ -176,7 +176,8 @@ def admin_add(request):
             msg_txt = """ Welcome to Flinter! 
 
 Your profile is generated, please use the email add which you have received this email from as your Username and %s
-as password to login. For your safety, please change your password once you login the system.
+as password to login https://admin.flinter.app. You will also receive a separate onboarding email about setting up your Flinter Profile 
+and how to start using it to connect and communicate. For your safety, please change your password once you log into the system.
                       
 See you in the community, new Flinter!
 

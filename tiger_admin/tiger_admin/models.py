@@ -169,6 +169,7 @@ class Gallery(models.Model):
 
 
 class Enquiry(models.Model):
+    id = models.IntegerField()
     name = models.CharField(max_length=64)
     company = models.CharField(max_length=128)
     email = models.CharField(max_length=64)

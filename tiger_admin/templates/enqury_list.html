@@ -10,6 +10,7 @@
         <table class="mws-datatable-fn mws-table" id="datatable">
             <thead>
                 <tr>
+                    <th>ID</th>
                     <th>Name</th>
                     <th>Payment Reference No.</th>
                     <th>Email</th>
@@ -22,6 +23,7 @@
             <tbody>
                 {% for c in object_list %}
                 <tr class="gradeX">
+                    <td>{{ u.id }}</td>
                     <td>{{ c.name }}</td>
                     <td>{{ c.company }}</td>
                     <td>{{ c.email }}</td>
